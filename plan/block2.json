@@ -1,0 +1,53 @@
+{
+  "name": "Running Block 2 (post-5K)",
+  "goal": "Aerobic base and repeat-effort capacity for padel. Not race times.",
+  "runs_per_week": 3,
+  "session_types": {
+    "easy": {
+      "pace": "12:45/mi home terrain (flat roads ~1 min/mi faster at same HR)",
+      "hr": [135, 148],
+      "cue": "Talk test is the real rule. Perceived effort lags HR; trust the numbers.",
+      "warmup": "5 min walk (19-20 min/mi)", "cooldown": "5 min walk"
+    },
+    "threshold": {
+      "pace": "10:15-10:45/mi", "hr": [170, 178],
+      "recovery": "jog 14:30-15:30/mi, HR falling toward 140",
+      "cue": "Rep 4 should match rep 1.",
+      "warmup": "5 min walk + 5 min easy jog", "cooldown": "3 min easy jog + 5 min walk"
+    },
+    "sprint": {
+      "pace": "~90% effort, ~6:00-7:00/mi",
+      "recovery": "45-60 s easy jog",
+      "cue": "Sprint between two fixed landmarks. If a rep falls short of rep 1, stop.",
+      "warmup": "5 min walk + 5 min easy jog", "cooldown": "3 min easy jog + 5 min walk"
+    },
+    "time_trial": {
+      "pace": "best even effort", "cue": "Mile on a track.",
+      "warmup": "5 min walk + 5 min easy jog", "cooldown": "3 min easy jog + 5 min walk"
+    },
+    "baseline": {
+      "pace": "easy effort, 2 miles, flat, fresh legs",
+      "hr": [135, 148],
+      "cue": "Needs 2 days off running and no padel the day before. Compare to Sep 14: 12:48/mi @ HR 137. 12:45 @ <=135 = clearly fitter; 12:45 @ >=145 = fatigue/heat/undertraining (investigate, don't panic).",
+      "warmup": "5 min walk", "cooldown": "5 min walk"
+    }
+  },
+  "weeks": [
+    [{"type": "easy", "min": 25}, {"type": "sprint", "reps": 8, "secs": 15}, {"type": "easy", "min": 30}],
+    [{"type": "easy", "min": 25}, {"type": "threshold", "reps": 4, "mins": 3}, {"type": "easy", "min": 30}],
+    [{"type": "easy", "min": 30}, {"type": "sprint", "reps": 10, "secs": 15}, {"type": "easy", "min": 30}],
+    [{"type": "easy", "min": 25}, {"type": "threshold", "reps": 5, "mins": 3}, {"type": "easy", "min": 35}],
+    [{"type": "easy", "min": 30}, {"type": "sprint", "reps": 12, "secs": 15}, {"type": "easy", "min": 30}],
+    [{"type": "easy", "min": 25}, {"type": "threshold", "reps": 5, "mins": 3, "recovery_s": 150}, {"type": "easy", "min": 35}],
+    [{"type": "easy", "min": 30}, {"type": "sprint", "reps": 10, "secs": 20, "recovery_s": 60}, {"type": "easy", "min": 30}],
+    [{"type": "easy", "min": 25}, {"type": "time_trial", "dist_mi": 1}, {"type": "easy", "min": 30}]
+  ],
+  "rules": [
+    "At least one rest day between runs.",
+    "No quality session the day after padel.",
+    "Calves, kneecap or medial knee ache: swap quality for easy, or walk.",
+    "Skip sprint sessions if padel and fast-feet drills already covered repeat-sprint load that week.",
+    "Gait: short, quick steps; foot lands under the hips; let people pass on seafronts.",
+    "Glute activation before every run: bridges 2x15, right single-leg bridges 2x12, banded walks, clamshells."
+  ]
+}

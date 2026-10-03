@@ -1,0 +1,6 @@
+{
+  "_note": "Where Neil is in the block. Update when a planned session is done. 'pending' runs before the next plan session.",
+  "week": 1,
+  "done": [0, 1],
+  "pending": [{"type": "baseline", "dist_mi": 2}]
+}
