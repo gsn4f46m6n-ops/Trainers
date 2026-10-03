@@ -1,0 +1,815 @@
+<title>Neil's Training Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column of tool panels behind a scoreboard-style tab strip; timers get a full-width "court" face. */
+:root{
+  --bg:#eef2f2; --surface:#fbfcfc; --sunk:#e3e9ea; --line:#d3dcde;
+  --ink:#14202a; --ink2:#46545e; --muted:#6f7c85;
+  --accent:#1f4fa0; --accent-ink:#ffffff;
+  --work:#c4420c; --rest:#0b7d72; --walk:#5d6f7a;
+  --good:#0ca30c; --warn:#b77900; --crit:#d03b3b;
+  --s-lower:#2a78d6; --s-upper:#eb6834; --s-core:#1baf7a;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e151a; --surface:#152028; --sunk:#1c2932; --line:#2a3a44;
+  --ink:#e6edf1; --ink2:#b3c0c8; --muted:#8796a0;
+  --accent:#7fa6ea; --accent-ink:#0e151a;
+  --work:#ff7a3d; --rest:#3cc4b2; --walk:#93a5b0;
+  --good:#3ccf3c; --warn:#fab219; --crit:#ef6b6b;
+  --s-lower:#3987e5; --s-upper:#d95926; --s-core:#199e70;
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0e151a; --surface:#152028; --sunk:#1c2932; --line:#2a3a44;
+  --ink:#e6edf1; --ink2:#b3c0c8; --muted:#8796a0;
+  --accent:#7fa6ea; --accent-ink:#0e151a;
+  --work:#ff7a3d; --rest:#3cc4b2; --walk:#93a5b0;
+  --good:#3ccf3c; --warn:#fab219; --crit:#ef6b6b;
+  --s-lower:#3987e5; --s-upper:#d95926; --s-core:#199e70;
+  color-scheme:dark;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:980px;margin:0 auto}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:20px 10px}
+h1{font:700 2rem/1 var(--f-display);letter-spacing:.01em;text-transform:uppercase;margin:0}
+h1 small{display:block;font:500 .78rem/1.3 var(--f-body);letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-top:4px}
+h2{font:600 1.45rem/1.15 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:0;text-wrap:balance}
+h3{font:600 1rem/1.3 var(--f-body);margin:0}
+.eyebrow{font:500 .72rem/1.2 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;padding-block:8px;border-bottom:1px solid var(--line);scrollbar-width:none}
+nav.tabs button{flex:0 0 auto;border:0;background:transparent;color:var(--ink2);font:600 1.02rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;border-radius:8px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+nav.tabs button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section.panel{display:grid;gap:18px;padding-block:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.muted{color:var(--muted)} .small{font-size:.85rem}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 .92rem/1 var(--f-body);padding:10px 14px;border-radius:8px;cursor:pointer}
+button.btn:hover{border-color:var(--ink2)}
+button.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.btn.big{font:600 1.25rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.05em;padding:14px 22px}
+button.btn[disabled]{opacity:.5;cursor:default}
+button.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink2);font:500 .85rem/1 var(--f-body);padding:8px 11px;border-radius:999px;cursor:pointer}
+button.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+label.f{display:grid;gap:4px;font-size:.82rem;color:var(--ink2);min-width:0}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+textarea{min-height:110px;resize:vertical}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr));gap:10px}
+.note{border-left:3px solid var(--line);padding:6px 10px;color:var(--ink2);font-size:.88rem;background:var(--sunk);border-radius:0 6px 6px 0}
+.note.warn{border-color:var(--warn)} .note.crit{border-color:var(--crit)} .note.good{border-color:var(--good)}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 .74rem/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:5px 8px;border-radius:999px;background:var(--sunk);color:var(--ink2)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.good{color:var(--good)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)}
+.tablewrap{overflow-x:auto;min-width:0}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th{font:500 .72rem/1.2 var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px}
+.kpi{background:var(--sunk);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
+.kpi b{font:600 1.7rem/1.05 var(--f-display);font-variant-numeric:tabular-nums}
+.kpi span{font-size:.78rem;color:var(--muted)}
+ul.clean{margin:0;padding-left:18px;display:grid;gap:4px}
+.list{display:grid;gap:6px}
+.item{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;text-align:left;color:var(--ink);font:inherit;width:100%}
+.item[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.item .meta{color:var(--muted);font-size:.82rem}
+details summary{cursor:pointer;color:var(--ink2);font-size:.88rem}
+/* timer face */
+.face{border-radius:14px;padding:18px;display:grid;gap:12px;color:var(--surface);background:var(--walk);transition:background .3s}
+.face[data-kind="work"]{background:var(--work)} .face[data-kind="rest"]{background:var(--rest)} .face[data-kind="walk"],.face[data-kind="idle"]{background:var(--walk)}
+.face .phase{font:700 clamp(1.6rem,6vw,2.6rem)/1 var(--f-display);text-transform:uppercase;letter-spacing:.03em;text-wrap:balance}
+.face .clock{font:700 clamp(4.5rem,22vw,9rem)/.9 var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.face .sub{font:500 .95rem/1.3 var(--f-body);opacity:.92}
+.face .bar{height:8px;border-radius:4px;background:rgba(255,255,255,.28);overflow:hidden}
+.face .bar i{display:block;height:100%;width:0;background:currentColor;border-radius:4px}
+.face .controls{display:flex;flex-wrap:wrap;gap:8px}
+.face .controls button{border:2px solid currentColor;background:transparent;color:inherit;font:600 1.1rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.05em;padding:12px 18px;border-radius:10px;cursor:pointer}
+.face .controls button.solid{background:currentColor}
+.face .controls button.solid span{color:var(--work)}
+.face[data-kind="rest"] .controls button.solid span{color:var(--rest)}
+.face[data-kind="walk"] .controls button.solid span,.face[data-kind="idle"] .controls button.solid span{color:var(--walk)}
+.seglist{display:flex;flex-wrap:wrap;gap:4px}
+.seglist i{display:block;height:10px;border-radius:3px;background:var(--line);min-width:6px}
+.seglist i.work{background:var(--work)} .seglist i.rest{background:var(--rest)} .seglist i.walk{background:var(--walk)}
+.seglist i.done{opacity:.3} .seglist i.now{outline:2px solid var(--ink);outline-offset:1px}
+.drills{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:6px;counter-reset:d;margin:0;padding:0;list-style:none}
+.drills li{counter-increment:d;padding:8px 10px;border-radius:8px;background:var(--sunk);font-size:.9rem;display:flex;gap:8px}
+.drills li::before{content:counter(d);font:600 .95rem/1.4 var(--f-display);color:var(--muted);min-width:1.2em}
+.drills li.now{background:var(--work);color:var(--surface)} .drills li.done{opacity:.45}
+/* program cards */
+.prog{display:grid;gap:10px}
+.moves{display:grid;gap:0}
+.move{display:grid;gap:2px;padding-block:8px;border-bottom:1px solid var(--line)}
+.move b{font-weight:600;font-size:.93rem}
+.mode{font:600 .7rem/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:4px;background:var(--sunk);color:var(--ink2);white-space:nowrap}
+.mode.ecc{background:var(--s-lower);color:#fff}
+/* charts */
+.chart{position:relative;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{fill:var(--muted);font:13px var(--f-mono)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:12px/1.4 var(--f-mono);padding:6px 8px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-110%);z-index:3}
+.analysis{display:grid;gap:10px}
+.analysis h3{font:600 1.15rem/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.status{font-size:.85rem;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <h1>Neil's Training Hub<small>Run · Fast feet · Tonal · Padel</small></h1>
+  <div class="row small muted" id="conn"><span class="pill" id="connStrava">Strava</span><span class="pill" id="connDb">Log</span><span class="pill" id="connAi">Claude</span></div>
+</header>
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" data-tab="run" aria-selected="true">Run</button>
+  <button role="tab" data-tab="feet" aria-selected="false">Fast feet</button>
+  <button role="tab" data-tab="tonal" aria-selected="false">Tonal</button>
+  <button role="tab" data-tab="review" aria-selected="false">Review</button>
+  <button role="tab" data-tab="padel" aria-selected="false">Padel</button>
+  <button role="tab" data-tab="summary" aria-selected="false">Summary</button>
+</nav>
+
+<!-- RUN -->
+<section class="panel" id="tab-run" role="tabpanel">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div><div class="eyebrow">Running Block 2</div><h2 id="runTitle">Next session</h2></div>
+      <label class="f" style="width:auto">Week<select id="runWeek"></select></label>
+    </div>
+    <div class="row" id="runPicks"></div>
+    <div id="runAdvice" class="list"></div>
+    <div class="small muted" id="runTarget"></div>
+    <details id="customBox"><summary>Custom intervals</summary>
+      <div class="fields" style="margin-top:10px">
+        <label class="f">Warm-up walk (min)<input id="cWarm" type="number" min="0" value="5"></label>
+        <label class="f">Reps<input id="cReps" type="number" min="1" value="6"></label>
+        <label class="f">Work (sec)<input id="cOn" type="number" min="5" value="60"></label>
+        <label class="f">Recover (sec)<input id="cOff" type="number" min="0" value="90"></label>
+        <label class="f">Cool-down walk (min)<input id="cCool" type="number" min="0" value="5"></label>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="btn" id="cLoad">Load custom</button></div>
+    </details>
+  </div>
+  <div class="face" id="runFace" data-kind="idle">
+    <div class="sub" id="runStep">Pick a session, then start</div>
+    <div class="phase" id="runPhase">Ready</div>
+    <div class="clock" id="runClock">0:00</div>
+    <div class="bar"><i id="runBar"></i></div>
+    <div class="sub" id="runNext"></div>
+    <div class="controls">
+      <button class="solid" id="runGo"><span>Start</span></button>
+      <button id="runSkip">Skip</button>
+      <button id="runBack">Back</button>
+      <button id="runStop">Reset</button>
+    </div>
+  </div>
+  <div class="seglist" id="runSegs" aria-hidden="true"></div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><h3>Before you go</h3><span class="small muted">Glute activation, every run</span></div>
+    <div class="row" id="preRun"></div>
+    <div class="row">
+      <label class="row small" style="gap:6px"><input type="checkbox" id="voiceOn" style="width:auto" checked> Voice cues</label>
+      <button class="btn" id="markDone">Mark session done</button>
+      <span class="status" id="markStatus"></span>
+    </div>
+  </div>
+</section>
+
+<!-- FAST FEET -->
+<section class="panel" id="tab-feet" role="tabpanel" hidden>
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div><div class="eyebrow">Coach's footwork drill</div><h2>Fast feet · 45 on / 15 off</h2></div>
+      <label class="f" style="width:auto">Rounds<select id="feetRounds"><option value="1">1 × 12 min</option><option value="2">2 × 12 min</option></select></label>
+    </div>
+    <ol class="drills" id="drillList"></ol>
+  </div>
+  <div class="face" id="feetFace" data-kind="idle">
+    <div class="sub" id="feetStep">12 drills · 12 minutes</div>
+    <div class="phase" id="feetPhase">Ready</div>
+    <div class="clock" id="feetClock">0:45</div>
+    <div class="bar"><i id="feetBar"></i></div>
+    <div class="sub" id="feetNext"></div>
+    <div class="controls">
+      <button class="solid" id="feetGo"><span>Start</span></button>
+      <button id="feetSkip">Skip</button>
+      <button id="feetBack">Back</button>
+      <button id="feetStop">Reset</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="note">Eccentric-heavy drilling counts as load: skip the lateral bounds and back-glass block if calves or the right medial knee ache, and don't stack fast feet on a quality-run day.</div>
+    <div class="row"><button class="btn" id="feetLog">Log a fast-feet session</button><span class="status" id="feetStatus"></span></div>
+  </div>
+</section>
+
+<!-- TONAL -->
+<section class="panel" id="tab-tonal" role="tabpanel" hidden>
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><div><div class="eyebrow">From your Tonal history</div><h2>Strength load</h2></div><span class="small muted" id="tonalUpdated"></span></div>
+    <div id="tonalEmpty" class="note">Your Tonal summary shows up here once Claude syncs it. Tonal has no public API, so ask Claude in your training session to run the Tonal sync and refresh this page.</div>
+    <div class="kpis" id="tonalKpis"></div>
+    <div class="legend" id="tonalLegend" hidden><span><i style="background:var(--s-lower)"></i>Lower body</span><span><i style="background:var(--s-upper)"></i>Upper body</span><span><i style="background:var(--s-core)"></i>Core</span><span class="muted">lb per week (Mon start)</span></div>
+    <div class="chart" id="tonalChart"></div>
+    <details id="tonalTableBox" hidden><summary>Weekly table</summary><div class="tablewrap"><table id="tonalWeekTable"></table></div></details>
+  </div>
+  <div class="card">
+    <h3>Movements you train most</h3>
+    <div class="tablewrap"><table id="moveTable"></table></div>
+    <div class="small muted">Est. 1RM is Tonal's per-session best estimate. Few movements repeat often, so trends are thin.</div>
+  </div>
+  <div class="card">
+    <div><div class="eyebrow">Planned routines</div><h2>Tonal for running &amp; padel</h2></div>
+    <div class="note">Cutting phase: lifting is what protects lean mass. Aim for two Tonal sessions a week, one of them <b>Brakes</b>. Build each as a Custom Workout on Tonal and toggle the mode shown on each move.</div>
+    <div class="tablewrap"><table id="weekPlan"></table></div>
+    <div class="grid2" id="programs"></div>
+  </div>
+</section>
+
+<!-- REVIEW -->
+<section class="panel" id="tab-review" role="tabpanel" hidden>
+  <div class="grid2">
+    <div class="card">
+      <div><div class="eyebrow">Step 1</div><h2>Pick a session</h2></div>
+      <div class="row"><button class="chip" data-src="strava" aria-pressed="true">Strava</button><button class="chip" data-src="tonal" aria-pressed="false">Tonal</button></div>
+      <div id="sessionStatus" class="status"></div>
+      <div class="list" id="sessionList"></div>
+    </div>
+    <div class="card">
+      <div><div class="eyebrow">Step 2</div><h2>Whoop &amp; context</h2></div>
+      <div class="small muted">Whoop isn't connected to Claude yet. Copy these from the Whoop app.</div>
+      <div class="fields">
+        <label class="f">Strain<input id="wStrain" type="number" step="0.1" placeholder="12.4"></label>
+        <label class="f">Recovery %<input id="wRec" type="number" placeholder="64"></label>
+        <label class="f">HRV (ms)<input id="wHrv" type="number" placeholder="58"></label>
+        <label class="f">Resting HR<input id="wRhr" type="number" placeholder="54"></label>
+        <label class="f">Sleep (h)<input id="wSleep" type="number" step="0.1" placeholder="7.2"></label>
+      </div>
+      <div class="row" id="ctxChips"></div>
+      <label class="f">How it felt<textarea id="rNotes" placeholder="Legs heavy in mile 2, knee fine, chased someone at the end…"></textarea></label>
+      <div class="row"><button class="btn primary" id="analyze" disabled>Analyze session</button><button class="btn" id="analyzeStop" hidden>Stop</button></div>
+    </div>
+  </div>
+  <div class="card" id="metricsCard" hidden>
+    <div class="row" style="justify-content:space-between"><h3 id="metricsTitle">Session</h3><span class="small muted" id="metricsSub"></span></div>
+    <div class="kpis" id="metricsKpis"></div>
+    <div class="tablewrap"><table id="splitTable"></table></div>
+    <div id="metricsNotes" class="list"></div>
+  </div>
+  <div class="card analysis" id="analysisCard" hidden></div>
+  <div class="card">
+    <h3>Saved reviews</h3>
+    <div id="pastReviews" class="list"><div class="muted small">Saved analyses land here, newest first.</div></div>
+  </div>
+</section>
+
+<!-- PADEL -->
+<section class="panel" id="tab-padel" role="tabpanel" hidden>
+  <div class="card">
+    <div><div class="eyebrow">Post-match</div><h2>Drop your review transcript</h2></div>
+    <div class="note">Focus block: <b>contact point on lob returns / bandeja</b>. Everything else is logged but parked.</div>
+    <div class="fields">
+      <label class="f">Date<input id="mDate" type="date"></label>
+      <label class="f">Type<select id="mType"><option>League</option><option>Casual</option><option>Lesson</option><option>Tournament</option></select></label>
+      <label class="f">Result<input id="mResult" placeholder="6-4 3-6 7-5"></label>
+      <label class="f">Minutes<input id="mMin" type="number" placeholder="90"></label>
+      <label class="f">Whoop strain<input id="mStrain" type="number" step="0.1" placeholder="17.1"></label>
+      <label class="f">% time in Z5<input id="mZ5" type="number" placeholder="23"></label>
+      <label class="f">Real meal (h before)<input id="mMeal" type="number" step="0.5" placeholder="3"></label>
+    </div>
+    <label class="f">Transcript<textarea id="mText" style="min-height:200px" placeholder="Paste the narrated point-by-point review here. Garbled auto-transcription is fine."></textarea></label>
+    <div class="row"><button class="btn primary" id="mAnalyze">Analyze match</button><button class="btn" id="mStop" hidden>Stop</button><button class="btn" id="mLogOnly">Log without transcript</button><span class="status" id="mStatus"></span></div>
+  </div>
+  <div class="card analysis" id="mResultCard" hidden></div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><h3>Focus-area trend</h3><span class="small muted">1–5 per analyzed match</span></div>
+    <div class="legend" id="mLegend" hidden><span><i style="background:var(--s-lower)"></i>Bandeja / lob-return execution</span><span><i style="background:var(--s-upper)"></i>Diagnosis quality</span></div>
+    <div class="chart" id="mChart"><div class="muted small">Analyze two or more matches to see the trend.</div></div>
+    <div class="list" id="mPast"></div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="panel" id="tab-summary" role="tabpanel" hidden>
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><div><div class="eyebrow">Everything together</div><h2>Performance summary</h2></div><button class="btn primary" id="sumBuild">Write my summary</button></div>
+    <div class="kpis" id="sumKpis"></div>
+    <div class="status" id="sumStatus"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><h3>Last 14 days</h3><span class="small muted">Hard days: quality run, padel (strain 15+), lower-body Tonal, HIIT</span></div>
+    <div class="tablewrap"><table id="loadTable"></table></div>
+    <div id="loadFlags" class="list"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><h3>Running miles per week</h3><span class="small muted">Strava</span></div>
+    <div class="chart" id="runChart"><div class="muted small">Loading Strava…</div></div>
+  </div>
+  <div class="card analysis" id="sumCard" hidden></div>
+</section>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+"use strict";
+/* ---------- static content ---------- */
+const PLAN = {
+  types:{
+    easy:{pace:"12:45/mi home terrain (flat roads ~1 min/mi faster at same HR)",hr:[135,148],cue:"Talk test is the real rule. Perceived effort lags HR; trust the numbers.",warmup:"5 min walk",cooldown:"5 min walk"},
+    threshold:{pace:"10:15-10:45/mi",hr:[170,178],recovery:"jog 14:30-15:30/mi, HR falling toward 140",cue:"Rep 4 should match rep 1.",warmup:"5 min walk + 5 min easy jog",cooldown:"3 min easy jog + 5 min walk"},
+    sprint:{pace:"~90% effort, ~6:00-7:00/mi",recovery:"45-60 s easy jog",cue:"Sprint between two fixed landmarks. If a rep falls short of rep 1, stop.",warmup:"5 min walk + 5 min easy jog",cooldown:"3 min easy jog + 5 min walk"},
+    time_trial:{pace:"best even effort",cue:"Mile on a track.",warmup:"5 min walk + 5 min easy jog",cooldown:"3 min easy jog + 5 min walk"},
+    baseline:{pace:"easy effort, 2 miles, flat, fresh legs",hr:[135,148],cue:"Needs 2 days off running and no padel the day before. Compare to Sep 14: 12:48/mi @ HR 137.",warmup:"5 min walk",cooldown:"5 min walk"}
+  },
+  weeks:[
+    [{type:"easy",min:25},{type:"sprint",reps:8,secs:15},{type:"easy",min:30}],
+    [{type:"easy",min:25},{type:"threshold",reps:4,mins:3},{type:"easy",min:30}],
+    [{type:"easy",min:30},{type:"sprint",reps:10,secs:15},{type:"easy",min:30}],
+    [{type:"easy",min:25},{type:"threshold",reps:5,mins:3},{type:"easy",min:35}],
+    [{type:"easy",min:30},{type:"sprint",reps:12,secs:15},{type:"easy",min:30}],
+    [{type:"easy",min:25},{type:"threshold",reps:5,mins:3,recovery_s:150},{type:"easy",min:35}],
+    [{type:"easy",min:30},{type:"sprint",reps:10,secs:20,recovery_s:60},{type:"easy",min:30}],
+    [{type:"easy",min:25},{type:"time_trial",dist_mi:1},{type:"easy",min:30}]
+  ]
+};
+const DEFAULT_STATE = {week:1, done:[0,1], pending:[{type:"baseline",dist_mi:2}]};
+const QUALITY = new Set(["sprint","threshold","time_trial"]);
+const PRE_RUN = ["Bridges 2×15","Right single-leg bridges 2×12","Banded walks","Clamshells"];
+const DRILLS = ["Calf pumps","Boxer bounce","Split-step figure 8","2 forward, 2 back","Lateral bounds","Back-glass movement","Low lateral steps","Bandeja & volleys","Lateral skier","Fast feet","L-shape turns","Figure of 8"];
+const CTX = [["padel_prev_day","Padel yesterday"],["alcohol","Alcohol last night"],["travel","Travel"],["heat","Heat"],["hills","Hills"],["fatigue","Tired legs"],["ache","Ache / niggle"]];
+
+const PROGRAMS = [
+  {id:"A",name:"Brakes",sub:"Lower body · eccentric · ~40 min",hard:true,
+   why:"Deceleration is the gap: you've done 5 eccentric lower-body sets since May. Slow lowering under load trains the quads, glutes and hamstrings to absorb force when you stop, change direction and stay low.",
+   moves:[["Goblet Squat","3 × 6","Eccentric","3 s down; sit to the same depth every rep"],
+          ["RDL","3 × 6","Eccentric","Hips back, soft knees; hamstrings are the brake"],
+          ["Bulgarian Split Squat","3 × 6 / side","Eccentric","Right leg first, plus one extra right set. Knee ache: swap for Goblet Reverse Lunge"],
+          ["Resisted Lateral Lunge","3 × 8 / side","Spotter","Sit into the hip and stay low; this is your ready-position strength"],
+          ["Standing Diagonal Glute Kickback","2 × 12 R, 1 × 12 L","Standard","Squeeze and hold 1 s; right glute under-recruits"],
+          ["Resisted Calf Raise","3 × 12","Eccentric","3 s down; one extra set for the left calf"],
+          ["Half Kneeling Pallof Press","2 × 10 / side","Standard","Ribs down, no rotation"]]},
+  {id:"B",name:"Engine",sub:"Upper body + rotation · ~35 min",hard:false,
+   why:"Keeps upper-body strength while you cut (upper score slid from 1268 to 1227) and builds the trunk rotation your bandeja and volleys need. Fine the day after padel.",
+   moves:[["Seated Row","3 × 8","Standard","Your most consistent pull; add 2 lb when RIR ≥ 2"],
+          ["Standing Incline Press","3 × 8","Spotter","Best progress so far (39 → 48 lb est. 1RM)"],
+          ["Seated Single-Arm Lat Pulldown","3 × 10 / side","Standard","Full stretch at the top"],
+          ["Single-Arm Bench Press","3 × 8 / side","Spotter","Anti-rotation as much as press"],
+          ["Rotational Chop","3 × 8 / side","Eccentric","Fast up, slow back; padel overhead pattern"],
+          ["Rotational Lift","3 × 8 / side","Standard","Drive from the back hip"],
+          ["External Shoulder Rotation","2 × 12 / side","Standard","Light; shoulder health for overheads"]]},
+  {id:"C",name:"Spring",sub:"Single-leg power · ~25 min · optional",hard:true,
+   why:"Explosiveness late in matches. Short and fast, for weeks with two or fewer padel sessions. Move fast on the way up, under control on the way down.",
+   moves:[["Resisted Step Up","3 × 6 / side","Standard","Explode up, step down slowly"],
+          ["Single-Leg RDL","3 × 8 / side","Standard","Balance without looking down; trains vision-independent balance"],
+          ["Reverse Lunge with Rotation","3 × 6 / side","Standard","Rotate over the front leg; staying low while turning"],
+          ["Resisted Glute Bridge","3 × 10","Standard","Last set single-leg, right side"],
+          ["Standing Single-Leg Hamstring Curl","2 × 10 / side","Eccentric","Slow return; hamstring brake"],
+          ["Single-Arm Rotational Punch","3 × 8 / side","Standard","Speed: as fast as you can control"]]}
+];
+const WEEK_PLAN = [
+  ["Mon","Easy run","Engine (B)"],["Tue","Padel","—"],["Wed","Quality run","—"],
+  ["Thu","Rest or fast feet","Brakes (A)"],["Fri","Padel","—"],["Sat","Easy run","Spring (C), optional"],["Sun","Rest","—"]
+];
+
+const COACH = `ATHLETE: Neil. Strength-trained for years; padel ~4.0, 2-3x/week (Whoop strain 16-20); coach-designed fast-feet drills (12 min, 45 s on / 15 s off) up to 5x/week. Started running Aug 3 2026 from a low aerobic base. Goal: on-court endurance (recover between points, stay explosive late in matches, stay low in the athletic stance), NOT race times. On an oral GLP-1, ~187 -> ~177 lb, target 175; protect lean mass with protein (140-170 g/day) and lifting; do not add cardio to speed the cut. Measured max HR 201.
+Weaknesses: right glute under-recruits, left calf endurance, poor deceleration ("strong engine, weak brakes"), staying low. Recurring: right medial knee (pes anserine) ache, kneecap ache after fast running, calves after long efforts, tailbone-area back ache when fatigued.
+RUNNING RULES: easy runs ~12:45/mi on home terrain (Moss Beach) at HR 137-148; flat roads ~1 min/mi faster at the same HR. Perceived exertion lags HR ("felt easy" has repeatedly coincided with higher HR). Padel strain >15 makes the next-day run read 10+ bpm hot; no quality the day after padel. Alcohol raises next-day HR ~10 bpm; travel and heat raise it too. At least one rest day between runs; 3+ hard days in a row blocks quality. Best data comes from two-day gaps between runs. Tendon/bone adapt slower than the heart: watch impact-volume jumps separately from HR.
+Session targets: easy HR 135-148; threshold 10:15-10:45/mi at HR 170-178 with jog recoveries (rep 4 should match rep 1); sprints ~6:00-7:00/mi, stop if a rep falls short of rep 1.
+BENCHMARKS: Sep 12 first 5K 34:43 (avg HR 163, out too fast in mile 2). Sep 14 home easy 12:48/mi @ HR 137 (baseline). Sep 18 same route 12:44 @ HR 149 (fatigue). Sep 22 Mallorca flat mile 1 11:43 @ 140. Sep 30 fastest mile 9:31 @ HR 160. Oct 2 Maryland heat+hills day after padel: 4x3 min became hill efforts, avg HR 163, max 194.
+DATA CAVEATS: Strava zones use age-based max 188, so zone labels run hot. Whoop elevation is inflated; wrist HR unreliable in padel; padel calories inflated. Whoop zones were recalibrated several times.
+TONAL (May 18-Sep 13): ~1.6 sessions/week, nothing since Sep 13; lower body 30% of volume; only 5 eccentric lower-body sets ever; strength score flat (overall 1078 -> 1072).
+Use miles and min/mi. Be specific and plain; no hype.`;
+
+const PADEL_CTX = `PADEL PROFILE: ~4.0 player, coach Navarro. Goal: play through 3 full hard sets without physical or technical collapse, and raise overall level.
+CURRENT FOCUS (only one, by design): contact point on lob returns / bandeja.
+Failure chain: starts moving too late -> sets feet too early -> not behind the ball -> hits from underneath -> contact too high -> ball bounces big and gets attacked.
+Checklist (his wording): 1 Start moving the moment the opponent gears up for the lob, not when it's in the air. 2 Rotate and move back, 3 powerful steps, don't set feet early. 3 Get behind the ball before contact. 4 Give yourself space; don't hit from directly under the ball. 5 Contact at forehead/head height. 6 Goal: ball takes its SECOND bounce at the wall, not the first; slow and controlled.
+ROOT-CAUSE THESIS: nearly every technical issue traces to late initiation and tennis motor patterns returning under time pressure (closed racket face on bandeja setup; elbow rising / coming over the top; "swooping" topspin loop on approaches and short volleys; take-back behind the head, follow-through over the shoulder; waiting for the ball to drop instead of taking it early).
+NAVARRO: short middle volley, bajada and bandeja are the same ball: come down on it and PUSH (Neil's nuance: "come down" without "push" swapped a bouncy-ball problem for a netted-ball problem). Wait for the right ball; it's rarer than you think. Groundstrokes: no wrist coming up, racket low, racket back before the bounce, push forward not up, compact. Vs net players: feet / body / high to the backhand / full lob.
+RECURRING WEAKNESSES: short volleys scooping (appears improved); hit-and-admire, no recovery (appears improved); down-the-line when cross/middle was right (appears improved); treating setup balls as finishers / losing focus on easy balls (LIVE); no-man's-land, creeping forward before opponent smashes (logged); shoulder-to-waist-height forehand (unsolved).
+STRENGTHS: point construction; tactical reads (chiquita down the middle, pace variation, open middle); precise self-diagnosis; hitting to feet.
+MENTAL (active since late Sep): "I get more upset when I make mistakes. They compound." Errors come on SIMPLE balls: an attention problem. Framework (Gallwey, Afremow): process goal pre-match; during the point give attention a sensory job (watch ball to contact), don't self-instruct; after an error a fixed routine (turn away, adjust strings, breathe, face forward), no verdict; judgment belongs in review.
+PHYSICAL: strong engine, weak brakes; right glute under-recruitment; left calf endurance; vision-dependent balance. GLP-1 meal timing: a fat/protein meal under ~2 h before a match reliably causes nausea-type fatigue mid-match (cost a set led 5-3). Rule: real meal 3+ h before; only light fast carbs inside 1 h.
+METHOD RULES: transcripts are auto-transcribed and garbled; read through fragments. UNIFORM-ATTENTION RULE: he reviews the whole match evenly, so a previously flagged weakness going unmentioned is soft evidence it improved, not missing data. Track diagnosis quality (how precisely he names failure points and causes) separately from execution quality; diagnosis leads.`;
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const el = (tag, attrs={}, ...kids) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if(k==="class") e.className=v; else if(k==="text") e.textContent=v; else if(k.startsWith("on")) e.addEventListener(k.slice(2),v); else if(v!==false&&v!=null) e.setAttribute(k,v);} for(const c of kids.flat()){ if(c!=null) e.append(c);} return e; };
+const M_PER_MI = 1609.344;
+const fmtClock = s => { s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60; return h? `${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}` : `${m}:${String(x).padStart(2,"0")}`; };
+const pace = (m, s) => m>0 ? fmtClock(s/(m/M_PER_MI)) : "–";
+const n0 = v => v==null||isNaN(v) ? "–" : Math.round(v).toLocaleString();
+const todayISO = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+const addDays = (iso, k) => { const d=new Date(iso+"T12:00:00"); d.setDate(d.getDate()+k); return d.toISOString().slice(0,10); };
+const mondayOf = iso => { const d=new Date(iso+"T12:00:00"); const k=(d.getDay()+6)%7; d.setDate(d.getDate()-k); return d.toISOString().slice(0,10); };
+const shortDate = iso => new Date(iso+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric"});
+const store = { get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v);}catch{ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch{} } };
+const setPill = (id, cls, text) => { const p=$(id); p.className="pill "+cls; p.textContent=text; };
+function mcpMessage(e, server="Strava"){
+  switch(e?.code){
+    case "needs_reauth": return `Reconnect ${server} in claude.ai Settings → Connectors.`;
+    case "server_not_connected": case "selection_required": return `Add ${server} in claude.ai Settings → Connectors, then reload.`;
+    case "not_in_manifest": return `${server} is turned off for this page. Allow it from the page's Permissions menu.`;
+    case "blocked_by_policy": case "approval_required": return `Your organization blocks this ${server} tool.`;
+    case "server_unavailable": return `${server} didn't answer. Try again in a minute.`;
+    case "tool_error": return `${server} said: ${e.message}`;
+    default: return `${server} isn't available here (${e?.code||"no connection"}).`;
+  }
+}
+function sampleMessage(e){
+  switch(e?.code){
+    case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled": case "capability_removed": return "Claude isn't allowed on this page. Allow it from the page's Permissions menu.";
+    case "rate_limited": return "Claude usage limit hit. Try again later.";
+    case "session_expired": return "Sign in to claude.ai again.";
+    case "prompt_too_large": return "Too much text. Trim the transcript and try again.";
+    case "invalid_json": return "Claude's answer came back malformed. Press the button again.";
+    case "refused": return "Claude declined this one. Rephrase the notes and try again.";
+    case "cancelled": return "Stopped.";
+    default: return "Claude didn't finish. Try again.";
+  }
+}
+
+/* ---------- capabilities ---------- */
+let db=null, mcp=null, sample=null;
+const S = { strava:null, stravaErr:null, tonal:null, sessions:[], matches:[], runState:null, perf:new Map() };
+
+/* ---------- tabs ---------- */
+function showTab(name){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.tab===name)));
+  document.querySelectorAll("section.panel").forEach(p=>p.hidden = p.id!=="tab-"+name);
+  store.set("tab",name);
+  if(name==="summary") renderSummary();
+}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+
+/* ---------- audio ---------- */
+let actx=null;
+function ensureAudio(){ try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); }catch{} }
+function beep(freq=880, dur=.12, when=0){ if(!actx) return; try{ const o=actx.createOscillator(), g=actx.createGain(); o.frequency.value=freq; o.type="square"; g.gain.setValueAtTime(.0001,actx.currentTime+when); g.gain.exponentialRampToValueAtTime(.25,actx.currentTime+when+.01); g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+when+dur); o.connect(g).connect(actx.destination); o.start(actx.currentTime+when); o.stop(actx.currentTime+when+dur+.02);}catch{} }
+function say(text){ if(!$("#voiceOn").checked) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.rate=1.05; speechSynthesis.speak(u);}catch{} }
+function buzz(p){ try{ navigator.vibrate?.(p); }catch{} }
+let wake=null;
+async function holdWake(on){ try{ if(on && !wake && navigator.wakeLock){ wake=await navigator.wakeLock.request("screen"); wake.addEventListener?.("release",()=>{wake=null;}); } else if(!on && wake){ await wake.release(); wake=null; } }catch{ wake=null; } }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && (runTimer.running||feetTimer.running)) holdWake(true); });
+
+/* ---------- interval timer ---------- */
+class IntervalTimer{
+  constructor(p, opts={}){ this.p=p; this.opts=opts; this.segs=[]; this.i=0; this.running=false; this.base=0; this.acc=0; this.lastBeep=null; this.handle=null;
+    $("#"+p+"Go").addEventListener("click",()=>this.toggle());
+    $("#"+p+"Skip").addEventListener("click",()=>this.jump(1));
+    $("#"+p+"Back").addEventListener("click",()=>this.jump(-1));
+    $("#"+p+"Stop").addEventListener("click",()=>this.reset()); }
+  load(segs){ this.segs=segs; this.reset(); }
+  elapsed(){ return this.acc + (this.running ? (performance.now()-this.base)/1000 : 0); }
+  toggle(){ if(!this.segs.length) return; ensureAudio();
+    if(this.running){ this.acc=this.elapsed(); this.running=false; clearInterval(this.handle); holdWake(false); }
+    else{ if(this.i>=this.segs.length){ this.reset(); } this.base=performance.now(); this.running=true; if(this.acc===0) this.announce(); this.handle=setInterval(()=>this.tick(),200); holdWake(true); }
+    this.render(); }
+  jump(d){ if(!this.segs.length) return; const n=Math.min(Math.max(this.i+d,0),this.segs.length); this.i=n; this.acc=0; this.base=performance.now(); this.lastBeep=null; if(n>=this.segs.length){ this.finish(); return; } if(this.running) this.announce(); this.render(); }
+  reset(){ clearInterval(this.handle); this.running=false; this.i=0; this.acc=0; this.lastBeep=null; holdWake(false); this.render(); }
+  announce(){ const s=this.segs[this.i]; if(!s) return;
+    if(s.kind==="work"){ beep(1046,.15); beep(1046,.15,.22); buzz([120,80,120]); } else { beep(523,.25); buzz(200); }
+    say(s.say || s.label); }
+  finish(){ clearInterval(this.handle); this.running=false; holdWake(false); beep(784,.15); beep(988,.15,.2); beep(1318,.3,.4); say("Done. Nice work."); this.i=this.segs.length; this.render(); this.opts.onDone?.(); }
+  tick(){ const s=this.segs[this.i]; if(!s) return; const e=this.elapsed();
+    if(s.secs){ const left=s.secs-e; const whole=Math.ceil(left);
+      if(left<=3.05 && whole>0 && whole!==this.lastBeep){ this.lastBeep=whole; beep(660,.08); }
+      if(left<=0){ this.i++; this.acc=Math.max(0,-left); this.base=performance.now(); this.lastBeep=null; if(this.i>=this.segs.length){ this.finish(); return; } this.announce(); } }
+    this.render(); }
+  render(){ const p=this.p, s=this.segs[this.i], face=$("#"+p+"Face");
+    const go=$("#"+p+"Go").firstElementChild; go.textContent=this.running?"Pause":(this.acc>0?"Resume":(this.i>=this.segs.length&&this.segs.length?"Again":"Start"));
+    if(!s){ face.dataset.kind="idle"; $("#"+p+"Phase").textContent=this.segs.length?"Finished":"Ready"; $("#"+p+"Clock").textContent=this.segs.length?fmtClock(this.segs.reduce((a,x)=>a+(x.secs||0),0)):"0:00"; $("#"+p+"Bar").style.width=this.segs.length?"100%":"0"; $("#"+p+"Next").textContent=""; }
+    else{ const e=this.elapsed(); face.dataset.kind=s.kind; $("#"+p+"Phase").textContent=s.label;
+      $("#"+p+"Clock").textContent = s.secs ? fmtClock(Math.ceil(s.secs-e)) : fmtClock(e);
+      $("#"+p+"Bar").style.width = s.secs ? Math.min(100,e/s.secs*100)+"%" : "100%";
+      const nx=this.segs[this.i+1]; const rem=this.segs.slice(this.i+1).reduce((a,x)=>a+(x.secs||0),0)+(s.secs?Math.max(0,s.secs-e):0);
+      $("#"+p+"Next").textContent=(nx?`Next: ${nx.label}${nx.secs?" · "+fmtClock(nx.secs):""}`:"Last one")+` · ${fmtClock(rem)} left`;
+      $("#"+p+"Step").textContent=(s.step||`Step ${this.i+1} of ${this.segs.length}`)+(s.secs?"":" · tap Skip when done"); }
+    this.opts.onRender?.(this);
+  }
+}
+
+/* ---------- run timer ---------- */
+function parseBlock(text, kindFor){ const out=[]; const re=/(\d+)\s*min\s+([a-z ]+?)(?=\s*\+|$)/gi; let m; while((m=re.exec(text))){ const what=m[2].trim(); out.push({label:what.replace(/^./,c=>c.toUpperCase()), secs:+m[1]*60, kind:kindFor(what)}); } return out; }
+const warmKind = w => /walk/.test(w)?"walk":"rest";
+function describe(s){ const t=s.type;
+  if(t==="easy") return `Easy ${s.min} min`;
+  if(t==="sprint") return `Sprints ${s.reps}×${s.secs}s`;
+  if(t==="threshold") return `Threshold ${s.reps}×${s.mins} min`;
+  if(t==="time_trial") return "Mile time trial";
+  if(t==="baseline") return `Baseline ${s.dist_mi} mi`;
+  return t; }
+function buildRun(s){ const T=PLAN.types[s.type]; const segs=[...parseBlock(T.warmup,warmKind).map(x=>({...x,step:"Warm-up"}))];
+  if(s.type==="easy") segs.push({label:"Easy run",secs:s.min*60,kind:"work",say:`Easy run, ${s.min} minutes. Heart rate 135 to 148.`,step:"Main set"});
+  else if(s.type==="sprint"){ const rec=s.recovery_s||50; for(let r=1;r<=s.reps;r++){ segs.push({label:`Sprint ${r}/${s.reps}`,secs:s.secs,kind:"work",say:`Sprint ${r}. Go!`,step:"Main set"}); if(r<s.reps) segs.push({label:"Easy jog",secs:rec,kind:"rest",say:"Jog easy",step:"Recovery"}); } }
+  else if(s.type==="threshold"){ const rec=s.recovery_s||90; for(let r=1;r<=s.reps;r++){ segs.push({label:`Hard ${r}/${s.reps}`,secs:s.mins*60,kind:"work",say:`Rep ${r}. ${s.mins} minutes hard, 10:15 to 10:45 pace.`,step:"Main set"}); if(r<s.reps) segs.push({label:"Jog recovery",secs:rec,kind:"rest",say:"Jog. Let heart rate fall toward 140.",step:"Recovery"}); } }
+  else if(s.type==="time_trial") segs.push({label:"Mile time trial",secs:null,kind:"work",say:"Time trial. Even effort.",step:"Main set"});
+  else if(s.type==="baseline") segs.push({label:`Baseline ${s.dist_mi} mi easy`,secs:null,kind:"work",say:"Baseline. Easy effort, heart rate 135 to 148.",step:"Main set"});
+  segs.push(...parseBlock(T.cooldown,warmKind).map(x=>({...x,step:"Cool-down"})));
+  return segs; }
+const runTimer = new IntervalTimer("run",{onRender:t=>renderSegs("#runSegs",t), onDone:()=>{$("#markStatus").textContent="Finished. Mark it done if it counts.";}});
+function renderSegs(sel,t){ const box=$(sel); box.replaceChildren(...t.segs.map((s,k)=>el("i",{class:`${s.kind}${k<t.i?" done":""}${k===t.i?" now":""}`,style:`flex:${Math.max(1,(s.secs||300)/30)} 1 0`}))); }
+let runPick=null;
+function nextSession(st){ if(st.pending?.length) return {...st.pending[0], pending:true};
+  let week=st.week; if(week>PLAN.weeks.length) return null; let rem=[0,1,2].filter(i=>!(st.done||[]).includes(i));
+  if(!rem.length){ week++; if(week>PLAN.weeks.length) return null; rem=[0]; }
+  return {...PLAN.weeks[week-1][rem[0]], week, idx:rem[0]}; }
+function renderRunPicker(){ const st=S.runState||DEFAULT_STATE; const sel=$("#runWeek"); const nxt=nextSession(st);
+  if(!sel.options.length){ PLAN.weeks.forEach((_,k)=>sel.append(el("option",{value:k+1,text:`Week ${k+1}`}))); sel.value=String(nxt?.week||st.week); }
+  const wk=+sel.value; const picks=$("#runPicks"); picks.replaceChildren();
+  const opts=[]; if(st.pending?.length) opts.push({...st.pending[0],pending:true,label:"Pending: "+describe(st.pending[0])});
+  PLAN.weeks[wk-1].forEach((s,i)=>opts.push({...s,week:wk,idx:i,label:`${["Run 1","Run 2","Run 3"][i]}: ${describe(s)}`}));
+  if(!runPick){ runPick = nxt ? opts.find(o=>(o.pending&&nxt.pending)||(o.week===nxt.week&&o.idx===nxt.idx)) || opts[0] : opts[0]; }
+  for(const o of opts){ const done=!o.pending && o.week===st.week && (st.done||[]).includes(o.idx) || (!o.pending && o.week<st.week);
+    picks.append(el("button",{class:"chip","aria-pressed":String(runPick&&o.label===runPick.label&&o.week===runPick.week),onclick:()=>{runPick=o; loadRun();}}, (done?"✓ ":"")+o.label)); }
+  loadRun(true); }
+function loadRun(keepButtons){ if(!runPick) return; if(!keepButtons) renderRunPicker();
+  const T=PLAN.types[runPick.type]; $("#runTitle").textContent=describe(runPick)+(runPick.pending?"":` · week ${runPick.week}`);
+  $("#runTarget").textContent=`Target ${T.pace}${T.hr?`, HR ${T.hr[0]}–${T.hr[1]}`:""}${T.recovery?`. Recovery: ${T.recovery}`:""}. ${T.cue}`;
+  if(!runTimer.running) runTimer.load(buildRun(runPick)); renderAdvice(); }
+$("#runWeek").addEventListener("change",()=>{ runPick=null; renderRunPicker(); });
+$("#cLoad").addEventListener("click",()=>{ const w=+$("#cWarm").value||0, r=Math.max(1,+$("#cReps").value||1), on=Math.max(5,+$("#cOn").value||60), off=+$("#cOff").value||0, c=+$("#cCool").value||0; const segs=[];
+  if(w) segs.push({label:"Walk",secs:w*60,kind:"walk",step:"Warm-up"});
+  for(let k=1;k<=r;k++){ segs.push({label:`Rep ${k}/${r}`,secs:on,kind:"work",say:`Rep ${k}. Go.`,step:"Main set"}); if(k<r&&off) segs.push({label:"Recover",secs:off,kind:"rest",say:"Recover",step:"Recovery"}); }
+  if(c) segs.push({label:"Walk",secs:c*60,kind:"walk",step:"Cool-down"});
+  runPick=null; document.querySelectorAll("#runPicks .chip").forEach(b=>b.setAttribute("aria-pressed","false")); $("#runTitle").textContent=`Custom ${r}×${on}s`; $("#runTarget").textContent=""; runTimer.load(segs); });
+$("#voiceOn").checked = store.get("voice",true); $("#voiceOn").addEventListener("change",e=>store.set("voice",e.target.checked));
+$("#preRun").append(...PRE_RUN.map(t=>el("button",{class:"chip","aria-pressed":"false",onclick:e=>e.currentTarget.setAttribute("aria-pressed",String(e.currentTarget.getAttribute("aria-pressed")!=="true"))},t)));
+$("#markDone").addEventListener("click", async ()=>{ if(!runPick){ $("#markStatus").textContent="Custom sessions aren't part of the block."; return; }
+  if(!db){ $("#markStatus").textContent="The log isn't available here, so progress can't be saved."; return; }
+  const st=structuredClone(S.runState||DEFAULT_STATE);
+  if(runPick.pending){ st.pending=(st.pending||[]).slice(1); }
+  else { if(runPick.week>st.week){ st.week=runPick.week; st.done=[]; } if(runPick.week===st.week){ st.done=[...new Set([...(st.done||[]),runPick.idx])].sort(); if(st.done.length===3){ st.week++; st.done=[]; } } }
+  st.updated=new Date().toISOString();
+  try{ await db.doc("state/run").set(st); $("#markStatus").textContent=`Saved: ${describe(runPick)} done.`; runPick=null; }catch(e){ $("#markStatus").textContent="Couldn't save ("+e.code+")."; } });
+function renderAdvice(){ const box=$("#runAdvice"); box.replaceChildren(); if(!runPick) return; const t=todayISO(), y=addDays(t,-1);
+  const runsY=(S.strava||[]).filter(a=>/Run/.test(a.sport_type)&&a.start_local.slice(0,10)===y);
+  const padelY=S.matches.filter(m=>m.date===y);
+  if(runsY.length) box.append(el("div",{class:"note warn"},"You ran yesterday. The block wants a rest day between runs."));
+  if(QUALITY.has(runPick.type)&&padelY.length) box.append(el("div",{class:"note crit"},"Padel yesterday: no quality today. Run easy instead, or move this session to tomorrow."));
+  else if(padelY.some(m=>!m.strain||m.strain>15)) box.append(el("div",{class:"note warn"},"Padel strain was 15+ yesterday: expect HR ~10 bpm hot. Judge by the talk test."));
+  if(runPick.type==="baseline"){ const last=(S.strava||[]).filter(a=>/Run/.test(a.sport_type)).map(a=>a.start_local.slice(0,10)).sort().pop(); if(last){ const off=Math.round((new Date(t)-new Date(last))/864e5)-1; if(off<2) box.append(el("div",{class:"note warn"},`Baseline needs 2 days off running; you've had ${Math.max(0,off)}.`)); } }
+}
+
+/* ---------- fast feet ---------- */
+const feetTimer = new IntervalTimer("feet",{onRender:t=>{ const cur=t.segs[t.i]; const di=cur?cur.drill:(t.segs.length&&t.i>=t.segs.length?99:-1);
+  document.querySelectorAll("#drillList li").forEach((li,k)=>{ li.className = k===di&&cur ? "now" : (cur&&k<di)||di===99 ? "done" : ""; }); }, onDone:()=>logFeet(true)});
+function buildFeet(){ const rounds=+$("#feetRounds").value; const segs=[];
+  for(let r=0;r<rounds;r++) DRILLS.forEach((d,k)=>{ const last=r===rounds-1&&k===DRILLS.length-1;
+    segs.push({label:d,secs:45,kind:"work",drill:k,say:d,step:`Drill ${k+1} of 12${rounds>1?` · round ${r+1}`:""}`});
+    if(!last) segs.push({label:"Rest · next "+DRILLS[(k+1)%12],secs:15,kind:"rest",drill:k,say:"Rest. Next, "+DRILLS[(k+1)%12],step:"Rest"}); });
+  feetTimer.load(segs); }
+$("#drillList").append(...DRILLS.map(d=>el("li",{},d)));
+$("#feetRounds").addEventListener("change",buildFeet);
+async function logFeet(auto){ if(!db){ $("#feetStatus").textContent="The log isn't available here."; return; }
+  try{ await db.collection("sessions").add({kind:"fastfeet",date:todayISO(),minutes:12*(+$("#feetRounds").value),created:new Date().toISOString(),title:"Fast feet"}); $("#feetStatus").textContent=auto?"Finished and logged.":"Logged."; }catch(e){ $("#feetStatus").textContent="Couldn't log ("+e.code+")."; } }
+$("#feetLog").addEventListener("click",()=>logFeet(false));
+
+/* ---------- tooltip & charts ---------- */
+const tip=$("#tip");
+function attachTip(container){ if(container.dataset.tipped) return; container.dataset.tipped="1"; container.addEventListener("pointermove",e=>{ const t=e.target.closest("[data-tip]"); if(!t){ tip.hidden=true; return; } tip.textContent=t.dataset.tip; tip.hidden=false; tip.style.left=e.pageX+"px"; tip.style.top=(e.pageY-8)+"px"; }); container.addEventListener("pointerleave",()=>tip.hidden=true); }
+const NS="http://www.w3.org/2000/svg";
+const sv=(tag,attrs)=>{ const e=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(attrs)) e.setAttribute(k,v); return e; };
+function niceMax(v){ if(v<=0) return 1; const p=10**Math.floor(Math.log10(v)); const m=v/p; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p; }
+function topPath(x,y,w,h,r){ r=Math.min(r,w/2,h); return `M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`; }
+function stackedBars(box, rows, keys, colors, labels, unit){ const W=640,H=220,L=44,R=8,T=10,B=26; const iw=W-L-R, ih=H-T-B;
+  const max=niceMax(Math.max(...rows.map(r=>keys.reduce((a,k)=>a+(r[k]||0),0)),1)); const svg=sv("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  for(let k=0;k<=4;k++){ const v=max*k/4, y=T+ih-ih*k/4; svg.append(sv("line",{x1:L,x2:W-R,y1:y,y2:y,stroke:"var(--line)","stroke-width":1})); const t=sv("text",{x:L-6,y:y+4,"text-anchor":"end"}); t.textContent=v>=1000?(v/1000)+"k":v; svg.append(t); }
+  const bw=iw/rows.length, w=Math.max(4,Math.min(28,bw*.62));
+  rows.forEach((r,i)=>{ let y=T+ih; const x=L+i*bw+(bw-w)/2; const tot=keys.reduce((a,k)=>a+(r[k]||0),0);
+    keys.forEach((k,j)=>{ const v=r[k]||0; if(!v) return; const h=ih*v/max; const isTop=keys.slice(j+1).every(kk=>!(r[kk]>0));
+      const gap = y<T+ih ? 2 : 0; const hh=Math.max(0,h-gap); y-=h;
+      svg.append(isTop? sv("path",{d:topPath(x,y,w,hh,4),fill:colors[j]}) : sv("rect",{x,y:y,width:w,height:hh,fill:colors[j]})); });
+    if(!tot){ svg.append(sv("rect",{x,y:T+ih-2,width:w,height:2,fill:"var(--line)"})); }
+    const hit=sv("rect",{x:L+i*bw,y:T,width:bw,height:ih,fill:"transparent"}); hit.dataset.tip=`${labels(r)} · ${tot.toLocaleString()} ${unit}`+(tot?" · "+keys.map((k,j)=>`${["lower","upper","core"][j]||k} ${Math.round(r[k]||0).toLocaleString()}`).join(" / "):""); svg.append(hit);
+    if(i%Math.ceil(rows.length/8)===0){ const t=sv("text",{x:L+i*bw+bw/2,y:H-8,"text-anchor":"middle"}); t.textContent=shortDate(r.week); svg.append(t); } });
+  box.replaceChildren(svg); attachTip(box); }
+function simpleBars(box, rows, val, label, unit, color){ const W=640,H=180,L=36,R=8,T=10,B=26; const iw=W-L-R, ih=H-T-B; const max=niceMax(Math.max(...rows.map(val),1));
+  const svg=sv("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  for(let k=0;k<=4;k++){ const v=max*k/4, y=T+ih-ih*k/4; svg.append(sv("line",{x1:L,x2:W-R,y1:y,y2:y,stroke:"var(--line)","stroke-width":1})); const t=sv("text",{x:L-6,y:y+4,"text-anchor":"end"}); t.textContent=+v.toFixed(1); svg.append(t); }
+  const bw=iw/rows.length, w=Math.max(4,Math.min(30,bw*.6));
+  rows.forEach((r,i)=>{ const v=val(r), h=ih*v/max, x=L+i*bw+(bw-w)/2; svg.append(v>0? sv("path",{d:topPath(x,T+ih-h,w,h,4),fill:color}) : sv("rect",{x,y:T+ih-2,width:w,height:2,fill:"var(--line)"}));
+    const hit=sv("rect",{x:L+i*bw,y:T,width:bw,height:ih,fill:"transparent"}); hit.dataset.tip=`${label(r)} · ${v.toFixed(1)} ${unit}`; svg.append(hit);
+    if(i%Math.ceil(rows.length/8)===0){ const t=sv("text",{x:L+i*bw+bw/2,y:H-8,"text-anchor":"middle"}); t.textContent=label(r).replace("Week of ",""); svg.append(t); } });
+  box.replaceChildren(svg); attachTip(box); }
+function lines(box, pts, series){ const W=640,H=180,L=28,R=90,T=10,B=26; const iw=W-L-R, ih=H-T-B; const svg=sv("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  for(let v=1;v<=5;v++){ const y=T+ih-ih*(v-1)/4; svg.append(sv("line",{x1:L,x2:W-R,y1:y,y2:y,stroke:"var(--line)","stroke-width":1})); const t=sv("text",{x:L-6,y:y+4,"text-anchor":"end"}); t.textContent=v; svg.append(t); }
+  const X=i=>L+(pts.length===1?iw/2:iw*i/(pts.length-1)), Y=v=>T+ih-ih*(v-1)/4;
+  series.forEach(s=>{ const ok=pts.map((p,i)=>[i,s.get(p)]).filter(([,v])=>v!=null);
+    if(ok.length>1) svg.append(sv("polyline",{points:ok.map(([i,v])=>`${X(i)},${Y(v)}`).join(" "),fill:"none",stroke:s.color,"stroke-width":2,"stroke-linejoin":"round"}));
+    ok.forEach(([i,v])=>{ const c=sv("circle",{cx:X(i),cy:Y(v),r:5,fill:s.color,stroke:"var(--surface)","stroke-width":2}); svg.append(c); });
+    const last=ok[ok.length-1]; if(last){ const t=sv("text",{x:X(last[0])+10,y:Y(last[1])+4}); t.textContent=s.name; t.setAttribute("style","fill:var(--ink2)"); svg.append(t); } });
+  pts.forEach((p,i)=>{ const hit=sv("rect",{x:X(i)-Math.max(10,iw/pts.length/2),y:T,width:Math.max(20,iw/pts.length),height:ih,fill:"transparent"}); hit.dataset.tip=`${shortDate(p.date)} · `+series.map(s=>`${s.name} ${s.get(p)??"–"}`).join(" · "); svg.append(hit);
+    const t=sv("text",{x:X(i),y:H-8,"text-anchor":"middle"}); t.textContent=shortDate(p.date); svg.append(t); });
+  box.replaceChildren(svg); attachTip(box); }
+function spark(vals){ if(vals.length<2) return el("span",{class:"muted small"},vals.length?vals[0]+" lb":"–"); const W=90,H=22; const mn=Math.min(...vals), mx=Math.max(...vals), sp=mx-mn||1;
+  const svg=sv("svg",{viewBox:`0 0 ${W} ${H}`,width:W,height:H}); const pts=vals.map((v,i)=>[3+i*(W-6)/(vals.length-1), H-3-(v-mn)/sp*(H-6)]);
+  svg.append(sv("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:"var(--accent)","stroke-width":2}));
+  const e=pts[pts.length-1]; svg.append(sv("circle",{cx:e[0],cy:e[1],r:3,fill:"var(--accent)"})); return svg; }
+
+/* ---------- Tonal ---------- */
+function renderTonal(){ const s=S.tonal; $("#tonalEmpty").hidden=!!s; $("#tonalLegend").hidden=!s; $("#tonalTableBox").hidden=!s; if(!s) return;
+  $("#tonalUpdated").textContent=`Synced ${new Date(s.generated).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}`;
+  const t=s.totals, wk=s.weeks, last4=wk.slice(-4), lastW=s.range.last;
+  const since=lastW?Math.round((new Date(todayISO())-new Date(lastW))/864e5):null;
+  $("#tonalKpis").replaceChildren(
+    el("div",{class:"kpi"},el("b",{},(t.sessions/Math.max(wk.length,1)).toFixed(1)),el("span",{},`sessions / week since ${shortDate(s.range.first)}`)),
+    el("div",{class:"kpi"},el("b",{},since==null?"–":since+" d"),el("span",{},`since last workout (${lastW?shortDate(lastW):"–"})`)),
+    el("div",{class:"kpi"},el("b",{},Math.round(t.lower/Math.max(t.volume,1)*100)+"%"),el("span",{},"of volume is lower body")),
+    el("div",{class:"kpi"},el("b",{},`${t.ecc_sets}/${t.sets}`),el("span",{},`eccentric sets · ${t.lower_ecc_sets} lower body`)),
+    el("div",{class:"kpi"},el("b",{},n0(last4.reduce((a,r)=>a+r.volume,0)/4)),el("span",{},"lb / week, last 4 weeks")));
+  stackedBars($("#tonalChart"), wk, ["lower","upper","core"], ["var(--s-lower)","var(--s-upper)","var(--s-core)"], r=>"Week of "+shortDate(r.week), "lb");
+  $("#tonalWeekTable").replaceChildren(el("tr",{},...["Week","Sessions","Volume","Lower","Upper","Core","Ecc. sets"].map((h,i)=>el("th",{class:i?"n":""},h))),
+    ...wk.map(r=>el("tr",{},el("td",{},shortDate(r.week)),...[r.sessions,r.volume,r.lower,r.upper,r.core,r.ecc_sets].map(v=>el("td",{class:"n"},n0(v))))));
+  $("#moveTable").replaceChildren(el("tr",{},...["Movement","Region","Sessions","Sets","Ecc.","Est. 1RM","Last"].map((h,i)=>el("th",{class:i>1&&i<5?"n":""},h))),
+    ...s.movements.slice(0,14).map(m=>el("tr",{},el("td",{},m.name),el("td",{},m.region),el("td",{class:"n"},m.sessions),el("td",{class:"n"},m.sets),el("td",{class:"n"},m.ecc_sets||"–"),
+      el("td",{},el("span",{class:"row",style:"gap:6px;flex-wrap:nowrap"},spark(m.est_1rm.map(x=>x.lb)),el("span",{class:"mono small"},m.est_1rm.length?`${m.est_1rm[0].lb}→${m.est_1rm[m.est_1rm.length-1].lb}`:""))),
+      el("td",{class:"small muted"},shortDate(m.last))))); }
+function renderPrograms(){ $("#weekPlan").replaceChildren(el("tr",{},el("th",{},"Day"),el("th",{},"Run / court"),el("th",{},"Tonal")), ...WEEK_PLAN.map(r=>el("tr",{},...r.map(c=>el("td",{},c)))));
+  $("#programs").replaceChildren(...PROGRAMS.map(p=>el("div",{class:"card prog"},
+    el("div",{class:"row",style:"justify-content:space-between"},el("div",{},el("div",{class:"eyebrow"},"Routine "+p.id),el("h2",{},p.name)),el("span",{class:"pill "+(p.hard?"warn":"good")},p.hard?"Counts as a hard day":"Easy-day friendly")),
+    el("div",{class:"small muted"},p.sub), el("div",{class:"small"},p.why),
+    el("div",{class:"moves"},...p.moves.map(m=>el("div",{class:"move"},el("div",{class:"row",style:"justify-content:space-between;flex-wrap:nowrap"},el("b",{},m[0]),el("span",{class:"mode"+(m[2]==="Eccentric"?" ecc":"")},m[2])),
+      el("div",{class:"small"},el("span",{class:"mono"},m[1]),el("span",{class:"muted"}," · "+m[3]))))))));
+  const rules=el("div",{class:"card",style:"grid-column:1/-1"},el("h3",{},"Placement rules"),el("ul",{class:"clean small"},
+    el("li",{},"Brakes and Spring count as hard days: never the day before a quality run, and not the day before a league match."),
+    el("li",{},"Engine is fine the day after padel or an easy run."),
+    el("li",{},"Progress when Tonal shows 2+ reps in reserve on the last set; add 2–3 lb."),
+    el("li",{},"Right medial knee or kneecap ache: drop split squats and step-ups for that session, keep the hinges.")));
+  $("#programs").append(rules); }
+
+/* ---------- Review ---------- */
+let reviewSrc="strava", picked=null, ctxOn=new Set(), reviewCtl=null, lastAnalysis=null;
+$("#ctxChips").append(...CTX.map(([k,l])=>el("button",{class:"chip","aria-pressed":"false",onclick:e=>{ ctxOn.has(k)?ctxOn.delete(k):ctxOn.add(k); e.currentTarget.setAttribute("aria-pressed",String(ctxOn.has(k))); }},l)));
+document.querySelectorAll("[data-src]").forEach(b=>b.addEventListener("click",()=>{ reviewSrc=b.dataset.src; document.querySelectorAll("[data-src]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderSessionList(); }));
+function renderSessionList(){ const box=$("#sessionList"); box.replaceChildren(); $("#sessionStatus").textContent="";
+  if(reviewSrc==="strava"){ if(S.stravaErr&&!S.strava){ $("#sessionStatus").textContent=S.stravaErr; return; } if(!S.strava){ $("#sessionStatus").textContent=mcp?"Loading Strava…":"Strava isn't reachable from this view."; return; }
+    for(const a of S.strava.slice(0,15)){ const mi=a.summary.distance/M_PER_MI; const isRun=/Run/.test(a.sport_type);
+      box.append(el("button",{class:"item","aria-pressed":String(picked?.id===a.id),onclick:()=>pickStrava(a)},el("span",{},el("div",{},a.name),el("div",{class:"meta"},`${shortDate(a.start_local.slice(0,10))} · ${a.location_summary||a.sport_type}`)),
+        el("span",{class:"mono small"},isRun?`${mi.toFixed(2)} mi · ${pace(a.summary.distance,a.summary.moving_time)}`:fmtClock(a.summary.moving_time)))); } }
+  else { if(!S.tonal){ $("#sessionStatus").textContent="No Tonal data synced yet."; return; }
+    for(const w of S.tonal.workouts.slice(0,15)) box.append(el("button",{class:"item","aria-pressed":String(picked?.tonal===w),onclick:()=>pickTonal(w)},el("span",{},el("div",{},w.title),el("div",{class:"meta"},`${shortDate(w.date)} · ${w.target||"—"}`)),el("span",{class:"mono small"},`${n0(w.volume)} lb · ${w.minutes} min`))); } }
+async function pickStrava(a){ picked={id:a.id,act:a}; renderSessionList(); $("#analyze").disabled=true; $("#analysisCard").hidden=true;
+  $("#metricsCard").hidden=false; $("#metricsTitle").textContent=a.name; $("#metricsSub").textContent=`${shortDate(a.start_local.slice(0,10))} · ${a.location_summary||""}`; $("#metricsKpis").replaceChildren(el("div",{class:"status"},"Loading heart rate and splits…")); $("#splitTable").replaceChildren(); $("#metricsNotes").replaceChildren();
+  try{ const [perf, streams] = await Promise.all([
+      mcp.callTool("Strava","get_activity_performance",{activity_id:a.id},{cache:{staleTime:3e5,gcTime:864e5}}),
+      /Run|Walk/.test(a.sport_type)? mcp.callTool("Strava","get_activity_streams",{activity_id:a.id,streams:["time","heart_rate","distance","velocity_smooth"]},{cache:{staleTime:3e5,gcTime:864e5}}) : Promise.resolve(null)]);
+    if(picked?.id!==a.id) return; picked.perf=perf.payload; picked.metrics=runMetrics(a, perf.payload, streams?.payload); renderMetrics(picked.metrics); $("#analyze").disabled=!sample;
+  }catch(e){ $("#metricsKpis").replaceChildren(el("div",{class:"note crit"},mcpMessage(e))); } }
+function pickTonal(w){ picked={tonal:w}; renderSessionList(); $("#analysisCard").hidden=true; $("#metricsCard").hidden=false; $("#metricsTitle").textContent=w.title; $("#metricsSub").textContent=`${shortDate(w.date)} · ${w.target}`;
+  $("#metricsKpis").replaceChildren(...[[n0(w.volume),"lb volume"],[w.minutes+" min","duration"],[n0(w.lower),"lb lower body"],[`${w.ecc_sets}/${w.sets}`,"eccentric sets"]].map(([b,s])=>el("div",{class:"kpi"},el("b",{},b),el("span",{},s))));
+  $("#splitTable").replaceChildren(); $("#metricsNotes").replaceChildren(el("div",{class:"small muted"},"Top movements: "+(w.top.join(", ")||"—"))); $("#analyze").disabled=!sample; }
+function runMetrics(a, perf, st){ const m={kind:a.sport_type,date:a.start_local.slice(0,10),name:a.name,place:a.location_summary,miles:+(a.summary.distance/M_PER_MI).toFixed(2),moving:fmtClock(a.summary.moving_time),pace:pace(a.summary.distance,a.summary.moving_time),elev_ft:Math.round((a.summary.elevation_gain||0)*3.281),relative_effort:a.summary.relative_effort,avg_hr:perf?.average_heartrate?Math.round(perf.average_heartrate):null,max_hr:perf?.max_heartrate||null,best_efforts:(perf?.best_efforts||[]).map(b=>`${b.display_text} ${fmtClock(b.value)}`)};
+  if(st?.time?.length && st.distance){ const T=st.time, D=st.distance, HR=st.heart_rate||[], V=st.velocity_smooth||[];
+    // mile splits
+    const splits=[]; let mark=M_PER_MI, i0=0;
+    for(let i=1;i<D.length;i++){ if(D[i]>=mark || i===D.length-1){ const part=i===D.length-1&&D[i]<mark; const dd=D[i]-D[i0], tt=T[i]-T[i0]; const hrs=HR.slice(i0,i+1); if(dd>80) splits.push({mile:part?`${(D[i]/M_PER_MI).toFixed(2)}`:String(splits.length+1),pace:pace(dd,tt),hr:hrs.length?Math.round(hrs.reduce((x,y)=>x+y,0)/hrs.length):null,maxhr:hrs.length?Math.max(...hrs):null}); i0=i; mark+=M_PER_MI; } }
+    m.splits=splits;
+    // time in HR bands
+    if(HR.length){ let easy=0,mid=0,hard=0; for(let i=1;i<T.length;i++){ const dt=T[i]-T[i-1], h=HR[i]; if(h<148) easy+=dt; else if(h<170) mid+=dt; else hard+=dt; } m.hr_time={under148:fmtClock(easy),"148to169":fmtClock(mid),over170:fmtClock(hard)};
+      // cardiac drift over running portion
+      const run=[]; for(let i=1;i<T.length;i++) if((V[i]||0)>1.6 && HR[i]) run.push(i);
+      if(run.length>20){ const half=Math.floor(run.length/2); const eff=idx=>{ let s=0,h=0; for(const i of idx){ s+=V[i]; h+=HR[i]; } return {v:s/idx.length,h:h/idx.length}; };
+        const a1=eff(run.slice(0,half)), a2=eff(run.slice(half)); m.drift={first_half:{pace:pace(a1.v*60,60),hr:Math.round(a1.h)},second_half:{pace:pace(a2.v*60,60),hr:Math.round(a2.h)},efficiency_drop_pct:+(((a1.v/a1.h)-(a2.v/a2.h))/(a1.v/a1.h)*100).toFixed(1)}; }
+      // rep detection and HR recovery
+      const mv=V.filter(v=>v>1.6).sort((x,y)=>x-y); const med=mv.length?mv[Math.floor(mv.length/2)]:0; const reps=[]; let s=null;
+      for(let i=0;i<V.length;i++){ const fast=V[i]>med*1.18; if(fast&&s==null) s=i; if(!fast&&s!=null){ if(T[i]-T[s]>=10) reps.push([s,i]); s=null; } }
+      const repTime=reps.reduce((x,[a,b])=>x+T[b]-T[a],0);
+      if(reps.length>=2 && reps.length<=20 && repTime<0.5*(T[T.length-1]-T[0])){ m.reps=reps.map(([s0,e],k)=>{ const dd=D[e]-D[s0], tt=T[e]-T[s0]; let lo=HR[e], j=e; while(j<T.length&&T[j]-T[e]<=90){ lo=Math.min(lo,HR[j]); j++; } return {rep:k+1,secs:Math.round(tt),pace:pace(dd,tt),peak_hr:Math.max(...HR.slice(s0,e+1)),hr_drop_90s:HR[e]-lo}; }); } } }
+  return m; }
+function renderMetrics(m){ $("#metricsKpis").replaceChildren(...[[m.miles+" mi",`${m.moving} moving`],[m.pace,"min/mi"],[m.avg_hr??"–","avg HR"],[m.max_hr??"–","max HR"],[m.elev_ft+" ft","climb"],m.drift?[m.drift.efficiency_drop_pct+"%","drift (pace per beat)"]:null].filter(Boolean).map(([b,s])=>el("div",{class:"kpi"},el("b",{},String(b)),el("span",{},s))));
+  if(m.reps) $("#splitTable").replaceChildren(el("tr",{},...["Rep","Time","Pace","Peak HR","HR drop 90 s"].map((h,i)=>el("th",{class:i?"n":""},h))),...m.reps.map(r=>el("tr",{},el("td",{},r.rep),el("td",{class:"n"},r.secs+"s"),el("td",{class:"n"},r.pace),el("td",{class:"n"},r.peak_hr),el("td",{class:"n"},r.hr_drop_90s))));
+  else if(m.splits?.length) $("#splitTable").replaceChildren(el("tr",{},...["Mile","Pace","Avg HR","Max HR"].map((h,i)=>el("th",{class:i?"n":""},h))),...m.splits.map(s=>el("tr",{},el("td",{},s.mile),el("td",{class:"n"},s.pace),el("td",{class:"n"},s.hr??"–"),el("td",{class:"n"},s.maxhr??"–"))));
+  const notes=[]; if(m.hr_time) notes.push(`HR time: under 148 ${m.hr_time.under148} · 148–169 ${m.hr_time["148to169"]} · 170+ ${m.hr_time.over170}`); if(m.drift) notes.push(`First half ${m.drift.first_half.pace} @ ${m.drift.first_half.hr} → second half ${m.drift.second_half.pace} @ ${m.drift.second_half.hr}`); if(m.best_efforts.length) notes.push("Best efforts: "+m.best_efforts.join(" · "));
+  $("#metricsNotes").replaceChildren(...notes.map(t=>el("div",{class:"small muted"},t))); }
+function whoop(){ const o={strain:+$("#wStrain").value||null,recovery_pct:+$("#wRec").value||null,hrv_ms:+$("#wHrv").value||null,resting_hr:+$("#wRhr").value||null,sleep_h:+$("#wSleep").value||null}; return Object.fromEntries(Object.entries(o).filter(([,v])=>v)); }
+function recentRuns(excludeId){ return (S.strava||[]).filter(a=>/Run/.test(a.sport_type)&&a.id!==excludeId).slice(0,8).map(a=>({date:a.start_local.slice(0,10),place:a.location_summary,miles:+(a.summary.distance/M_PER_MI).toFixed(2),pace:pace(a.summary.distance,a.summary.moving_time),elev_ft:Math.round((a.summary.elevation_gain||0)*3.281),relative_effort:a.summary.relative_effort})); }
+const ANALYSIS_FORMAT = `Reply with only a JSON object: {"headline": string (one sentence), "verdict": one of "fitter","on-track","hot-but-explained","fatigued","too-hard","not-comparable", "findings": [3-5 short strings, each citing a number], "confounders": [strings], "risk": [strings, knee/calf/tendon or load-stack flags; may be empty], "next": [2-3 concrete instructions for the next session]}`;
+function renderAnalysis(card, a, saveFn){ const v=a.verdict||""; const cls={"fitter":"good","on-track":"good","hot-but-explained":"info","fatigued":"warn","too-hard":"crit","not-comparable":"info"}[v]||"info";
+  card.hidden=false; card.replaceChildren(el("div",{class:"row",style:"justify-content:space-between"},el("h3",{},"Analysis"),v?el("span",{class:"pill "+cls},v.replace(/-/g," ")):null),
+    el("div",{},a.headline||""), ...[["What the numbers say",a.findings],["Confounders",a.confounders],["Risk",a.risk],["Next time",a.next]].filter(([,l])=>l?.length).map(([h,l])=>el("div",{},el("div",{class:"eyebrow"},h),el("ul",{class:"clean"},l.map(x=>el("li",{},String(x)))))),
+    saveFn?el("div",{class:"row"},el("button",{class:"btn",onclick:saveFn},"Save review"),el("span",{class:"status",id:"saveStatus"})):null); }
+$("#analyze").addEventListener("click", async ()=>{ if(!picked||!sample) return; const card=$("#analysisCard"); card.hidden=false; card.replaceChildren(el("div",{class:"status"},"Thinking… (usually 10–40 s)"));
+  reviewCtl=new AbortController(); $("#analyzeStop").hidden=false; $("#analyze").disabled=true;
+  const isTonal=!!picked.tonal; const ctx=[...ctxOn]; const w=whoop(); const notes=$("#rNotes").value.trim();
+  const data = isTonal ? {tonal_workout:picked.tonal, tonal_recent_weeks:S.tonal?.weeks.slice(-6), tonal_programs:PROGRAMS.map(p=>({name:p.name,moves:p.moves.map(m=>m[0]+" "+m[1]+" "+m[2])}))} : {session:picked.metrics, recent_runs:recentRuns(picked.id)};
+  const prompt = `You are Neil's coach reviewing one ${isTonal?"Tonal strength workout":"Strava activity"}.\n\n${COACH}\n\nSESSION DATA (JSON):\n${JSON.stringify(data)}\n\nWHOOP (entered by Neil): ${JSON.stringify(w)}\nCONTEXT FLAGS: ${ctx.join(", ")||"none"}\nNEIL'S NOTES: ${notes||"none"}\n\nJudge against his rules and benchmarks: compare pace at HR to the Sep 14 baseline only when terrain and context are comparable; apply the padel/alcohol/travel/heat corrections; for interval sessions use rep consistency and HR drop; for Tonal judge lower-body load, eccentric use and fit with running/padel. ${ANALYSIS_FORMAT}`;
+  try{ const a = await sample.json(prompt,{signal:reviewCtl.signal}); lastAnalysis={a,isTonal,ctx,w,notes,data};
+    renderAnalysis(card,a,saveReview); }catch(e){ card.replaceChildren(el("div",{class:"note "+(e.code==="cancelled"?"":"crit")},sampleMessage(e))); }
+  finally{ $("#analyzeStop").hidden=true; $("#analyze").disabled=false; } });
+$("#analyzeStop").addEventListener("click",()=>reviewCtl?.abort());
+async function saveReview(){ if(!db||!lastAnalysis){ $("#saveStatus").textContent="The log isn't available here."; return; } const L=lastAnalysis;
+  const doc={kind:L.isTonal?"tonal":"run",date:L.isTonal?L.data.tonal_workout.date:L.data.session.date,title:L.isTonal?L.data.tonal_workout.title:L.data.session.name,ref:L.isTonal?L.data.tonal_workout.date:picked?.id||null,
+    metrics:L.isTonal?L.data.tonal_workout:L.data.session,whoop:L.w,context:L.ctx,notes:L.notes,analysis:L.a,created:new Date().toISOString()};
+  try{ await db.collection("sessions").add(doc); $("#saveStatus").textContent="Saved."; }catch(e){ $("#saveStatus").textContent="Couldn't save ("+e.code+")."; } }
+function renderPastReviews(){ const box=$("#pastReviews"); const rows=S.sessions.filter(s=>s.analysis); if(!rows.length){ box.replaceChildren(el("div",{class:"muted small"},"Saved analyses land here, newest first.")); return; }
+  box.replaceChildren(...rows.slice(0,20).map(s=>{ const d=el("details",{},el("summary",{},`${shortDate(s.date)} · ${s.title} · ${s.analysis.verdict||""}`)); const c=el("div",{class:"analysis",style:"margin-top:8px"}); renderAnalysis(c,s.analysis,null); d.append(c); return d; })); }
+
+/* ---------- Padel ---------- */
+let mCtl=null;
+$("#mDate").value=todayISO();
+const MATCH_FORMAT = `Reply with only a JSON object: {"summary": string (2-3 sentences), "focus": {"score": integer 1-5 (execution of the bandeja/lob-return focus; 3 = mixed), "evidence": [short quotes or paraphrases from the transcript], "checklist": [{"item": string (checklist item 1-6, short), "status": "hit"|"miss"|"mixed"|"not mentioned"}]}, "failure_modes": [{"name": string, "type": "technical"|"tactical"|"physical"|"mental", "count": integer, "example": string}], "weaknesses": [{"name": string (from the recurring-weakness list), "status": "mentioned"|"not mentioned"}], "strengths": [strings], "mental": {"markers": [strings], "compounding": true|false, "routine_used": true|false|null}, "physical": {"fatigue_signs": [strings], "late_match_decline": true|false|null, "meal_flag": string|null}, "diagnosis_quality": integer 1-5, "execution_quality": integer 1-5, "next_cue": string (ONE cue for the next match, his language)}`;
+$("#mAnalyze").addEventListener("click", async ()=>{ const text=$("#mText").value.trim(); if(!text){ $("#mStatus").textContent="Paste a transcript first."; return; } if(!sample){ $("#mStatus").textContent="Claude isn't available on this page."; return; }
+  const meta=matchMeta(); const prior=S.matches.filter(m=>m.analysis).slice(0,5).map(m=>({date:m.date,type:m.type,focus_score:m.analysis.focus?.score,failure_modes:(m.analysis.failure_modes||[]).map(f=>f.name),weaknesses_mentioned:(m.analysis.weaknesses||[]).filter(w=>w.status==="mentioned").map(w=>w.name)}));
+  const card=$("#mResultCard"); card.hidden=false; card.replaceChildren(el("div",{class:"status"},"Reading the transcript… (20–60 s)")); mCtl=new AbortController(); $("#mStop").hidden=false; $("#mAnalyze").disabled=true;
+  const prompt = `You analyze Neil's narrated padel match reviews.\n\n${PADEL_CTX}\n\nMATCH: ${JSON.stringify(meta)}\nPRIOR ANALYZED MATCHES (newest first): ${JSON.stringify(prior)}\n\nTRANSCRIPT:\n"""\n${text.slice(0,60000)}\n"""\n\nExtract focus-area execution, recurring failure modes, self-assessed strengths/weaknesses, and mental-state markers. Apply the uniform-attention rule to weaknesses. Correlate any technical breakdown with strain, Z5 time, late-match fatigue and meal timing when given. Quote his words briefly as evidence. ${MATCH_FORMAT}`;
+  try{ const a=await sample.json(prompt,{signal:mCtl.signal}); renderMatch(card,a,meta); const save=el("div",{class:"row"},el("button",{class:"btn primary",onclick:async ()=>{ await saveMatch({...meta,transcript:text.slice(0,60000),analysis:a}); }},"Save match"),el("span",{class:"status",id:"mSaveStatus"})); card.append(save);
+  }catch(e){ card.replaceChildren(el("div",{class:"note "+(e.code==="cancelled"?"":"crit")},sampleMessage(e))); }
+  finally{ $("#mStop").hidden=true; $("#mAnalyze").disabled=false; } });
+$("#mStop").addEventListener("click",()=>mCtl?.abort());
+$("#mLogOnly").addEventListener("click",()=>saveMatch({...matchMeta(),transcript:"",analysis:null}));
+function matchMeta(){ const num=id=>{ const v=$(id).value; return v===""?null:+v; }; return {date:$("#mDate").value||todayISO(),type:$("#mType").value,result:$("#mResult").value.trim()||null,minutes:num("#mMin"),strain:num("#mStrain"),z5_pct:num("#mZ5"),meal_hours_before:num("#mMeal")}; }
+async function saveMatch(doc){ const st=$("#mSaveStatus")||$("#mStatus"); if(!db){ st.textContent="The log isn't available here."; return; }
+  try{ await db.collection("matches").add({...doc,created:new Date().toISOString()}); st.textContent="Saved."; }catch(e){ st.textContent="Couldn't save ("+e.code+")."; } }
+function renderMatch(card,a,meta){ const sc=a.focus?.score; const cls=sc>=4?"good":sc>=3?"info":"warn";
+  const statusCls={hit:"good",miss:"crit",mixed:"warn","not mentioned":""};
+  card.hidden=false; card.replaceChildren(
+    el("div",{class:"row",style:"justify-content:space-between"},el("h3",{},`${meta.type} · ${shortDate(meta.date)}${meta.result?" · "+meta.result:""}`),sc?el("span",{class:"pill "+cls},`Focus ${sc}/5`):null),
+    el("div",{},a.summary||""),
+    a.next_cue?el("div",{class:"note good"},el("b",{},"Next match cue: "),a.next_cue):null,
+    el("div",{class:"kpis"},...[["Execution",a.execution_quality],["Diagnosis",a.diagnosis_quality],["Failures",(a.failure_modes||[]).reduce((x,f)=>x+(+f.count||1),0)]].map(([l,v])=>el("div",{class:"kpi"},el("b",{},v??"–"),el("span",{},l)))),
+    a.focus?.checklist?.length?el("div",{},el("div",{class:"eyebrow"},"Bandeja checklist"),el("div",{class:"list"},a.focus.checklist.map(c=>el("div",{class:"row small",style:"justify-content:space-between"},el("span",{},c.item),el("span",{class:"pill "+(statusCls[c.status]||"")},c.status))))):null,
+    a.focus?.evidence?.length?el("div",{},el("div",{class:"eyebrow"},"Evidence"),el("ul",{class:"clean small"},a.focus.evidence.map(x=>el("li",{},String(x))))):null,
+    a.failure_modes?.length?el("div",{class:"tablewrap"},el("table",{},el("tr",{},el("th",{},"Failure mode"),el("th",{},"Type"),el("th",{class:"n"},"×"),el("th",{},"Example")),a.failure_modes.map(f=>el("tr",{},el("td",{},f.name),el("td",{},f.type),el("td",{class:"n"},f.count),el("td",{class:"small"},f.example||""))))):null,
+    a.weaknesses?.length?el("div",{},el("div",{class:"eyebrow"},"Recurring weaknesses"),el("div",{class:"row"},a.weaknesses.map(w=>el("span",{class:"pill "+(w.status==="mentioned"?"warn":"good")},`${w.name}: ${w.status==="mentioned"?"showed up":"not mentioned"}`)))):null,
+    a.strengths?.length?el("div",{},el("div",{class:"eyebrow"},"Strengths"),el("ul",{class:"clean small"},a.strengths.map(x=>el("li",{},String(x))))):null,
+    a.mental?el("div",{},el("div",{class:"eyebrow"},"Mental"),el("div",{class:"small"},[(a.mental.markers||[]).join("; "),a.mental.compounding?"Errors compounded.":null,a.mental.routine_used===true?"Used the reset routine.":a.mental.routine_used===false?"No reset routine.":null].filter(Boolean).join(" "))):null,
+    a.physical&&((a.physical.fatigue_signs||[]).length||a.physical.meal_flag)?el("div",{},el("div",{class:"eyebrow"},"Physical"),el("div",{class:"small"},[(a.physical.fatigue_signs||[]).join("; "),a.physical.late_match_decline?"Late-match decline.":null,a.physical.meal_flag].filter(Boolean).join(" "))):null); }
+function renderMatches(){ const done=S.matches.filter(m=>m.analysis).slice().sort((x,y)=>x.date.localeCompare(y.date));
+  $("#mLegend").hidden=done.length<2;
+  if(done.length>=2) lines($("#mChart"),done,[{name:"Execution",color:"var(--s-lower)",get:p=>p.analysis.focus?.score??null},{name:"Diagnosis",color:"var(--s-upper)",get:p=>p.analysis.diagnosis_quality??null}]);
+  $("#mPast").replaceChildren(...S.matches.slice(0,15).map(m=>{ const d=el("details",{},el("summary",{},`${shortDate(m.date)} · ${m.type}${m.result?" · "+m.result:""}${m.strain?` · strain ${m.strain}`:""}${m.analysis?.focus?.score?` · focus ${m.analysis.focus.score}/5`:m.analysis?"":" · no transcript"}`));
+    if(m.analysis){ const c=el("div",{class:"analysis",style:"margin-top:8px"}); renderMatch(c,m.analysis,m); d.append(c); } return d; })); }
+
+/* ---------- Summary ---------- */
+function weekKey(iso){ return mondayOf(iso); }
+function hardDays(){ const days={}; const mark=(d,k,hard,label)=>{ (days[d]??={items:[],hard:false}).items.push({k,label,hard}); if(hard) days[d].hard=true; };
+  for(const a of S.strava||[]){ const d=a.start_local.slice(0,10); if(/Run/.test(a.sport_type)){ const q=(a.summary.relative_effort||0)>=60 || (a.summary.max_speed||0)>4.5; mark(d,"run",q,`${(a.summary.distance/M_PER_MI).toFixed(1)} mi${q?" (hard)":""}`); } else if(/HIIT|Crossfit|HighIntensity/i.test(a.sport_type)) mark(d,"hiit",true,"HIIT"); }
+  for(const m of S.matches) mark(m.date,"padel",m.strain==null||m.strain>=15,`${m.type}${m.strain?" "+m.strain:""}`);
+  for(const w of S.tonal?.workouts||[]) mark(w.date,"tonal",/LOWER/i.test(w.target)||w.lower>2500,w.title);
+  for(const s of S.sessions) if(s.kind==="fastfeet") mark(s.date,"feet",false,"Fast feet");
+  return days; }
+function renderSummary(){ const t=todayISO(); const days=hardDays(); const span=[...Array(14)].map((_,k)=>addDays(t,k-13));
+  const rowsDef=[["run","Run"],["padel","Padel"],["tonal","Tonal"],["feet","Fast feet"],["hiit","HIIT"]];
+  $("#loadTable").replaceChildren(el("tr",{},el("th",{},""),...span.map(d=>el("th",{class:"n"},new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"narrow"})+" "+(+d.slice(8))))),
+    ...rowsDef.map(([k,l])=>el("tr",{},el("td",{},l),...span.map(d=>{ const it=(days[d]?.items||[]).filter(x=>x.k===k); return el("td",{class:"n",title:it.map(x=>x.label).join(", ")},it.length?el("span",{class:"pill "+(it.some(x=>x.hard)?"warn":"good"),style:"padding:3px 5px"},it.length>1?String(it.length):"•"):""); }))),
+    el("tr",{},el("td",{},el("b",{},"Hard day")),...span.map(d=>el("td",{class:"n"},days[d]?.hard?"■":""))));
+  const flags=[]; let streak=0, worst=0; for(const d of span){ streak=days[d]?.hard?streak+1:0; worst=Math.max(worst,streak); }
+  if(worst>=3) flags.push(el("div",{class:"note crit"},`${worst} hard days in a row in the last two weeks. Three or more blocks quality running.`));
+  const lastHard=span.slice().reverse().findIndex(d=>!days[d]?.hard); if(lastHard>=2) flags.push(el("div",{class:"note warn"},`${lastHard} hard days running into today: keep today easy.`));
+  $("#loadFlags").replaceChildren(...flags);
+  // weekly run miles
+  const runs=(S.strava||[]).filter(a=>/Run/.test(a.sport_type)); const wk={}; for(const a of runs){ const k=weekKey(a.start_local.slice(0,10)); wk[k]=(wk[k]||0)+a.summary.distance/M_PER_MI; }
+  const first=runs.length?weekKey(runs[runs.length-1].start_local.slice(0,10)):null; const wrows=[]; if(first){ for(let d=first; d<=weekKey(t); d=addDays(d,7)) wrows.push({week:d,mi:wk[d]||0}); }
+  if(wrows.length) simpleBars($("#runChart"),wrows.slice(-12),r=>r.mi,r=>"Week of "+shortDate(r.week),"mi","var(--s-lower)"); else if(S.strava) $("#runChart").replaceChildren(el("div",{class:"muted small"},"No runs on Strava yet."));
+  else if(S.stravaErr) $("#runChart").replaceChildren(el("div",{class:"note crit"},S.stravaErr));
+  const last28=runs.filter(a=>a.start_local.slice(0,10)>=addDays(t,-27)); const mi28=last28.reduce((x,a)=>x+a.summary.distance/M_PER_MI,0);
+  const feet14=S.sessions.filter(s=>s.kind==="fastfeet"&&s.date>=addDays(t,-13)).length; const pad28=S.matches.filter(m=>m.date>=addDays(t,-27)); const ton28=(S.tonal?.workouts||[]).filter(w=>w.date>=addDays(t,-27));
+  $("#sumKpis").replaceChildren(...[[mi28.toFixed(1),`run miles · last 28 d (${last28.length} runs)`],[pad28.length,"padel sessions · 28 d"],[ton28.length,"Tonal workouts · 28 d"],[feet14,"fast-feet logged · 14 d"]].map(([b,s])=>el("div",{class:"kpi"},el("b",{},String(b)),el("span",{},s)))); }
+let sumCtl=null;
+$("#sumBuild").addEventListener("click", async ()=>{ if(!sample){ $("#sumStatus").textContent="Claude isn't available on this page."; return; } const card=$("#sumCard"); card.hidden=false; card.replaceChildren(el("div",{class:"status"},"Pulling heart rate for recent runs…"));
+  const runs=(S.strava||[]).filter(a=>/Run/.test(a.sport_type)).slice(0,10); const perf=[];
+  for(const a of runs){ try{ const r=await mcp.callTool("Strava","get_activity_performance",{activity_id:a.id},{cache:{staleTime:3e5,gcTime:864e5}}); perf.push({date:a.start_local.slice(0,10),place:a.location_summary,miles:+(a.summary.distance/M_PER_MI).toFixed(2),pace:pace(a.summary.distance,a.summary.moving_time),elev_ft:Math.round((a.summary.elevation_gain||0)*3.281),avg_hr:Math.round(r.payload.average_heartrate||0)||null,max_hr:r.payload.max_heartrate||null}); }catch{ perf.push({date:a.start_local.slice(0,10),miles:+(a.summary.distance/M_PER_MI).toFixed(2),pace:pace(a.summary.distance,a.summary.moving_time)}); } }
+  card.replaceChildren(el("div",{class:"status"},"Thinking… (20–60 s)")); sumCtl=new AbortController();
+  const days=hardDays(); const t=todayISO();
+  const data={today:t,runs:perf,tonal:S.tonal?{totals:S.tonal.totals,last_workout:S.tonal.range.last,weeks:S.tonal.weeks.slice(-8),strength:S.tonal.strength.slice(-3),top_movements:S.tonal.movements.slice(0,8).map(m=>({name:m.name,sessions:m.sessions,est_1rm:m.est_1rm.map(x=>x.lb)}))}:null,
+    padel:S.matches.slice(0,8).map(m=>({date:m.date,type:m.type,strain:m.strain,z5:m.z5_pct,focus:m.analysis?.focus?.score,execution:m.analysis?.execution_quality,diagnosis:m.analysis?.diagnosis_quality,failures:(m.analysis?.failure_modes||[]).map(f=>f.name)})),
+    fast_feet_last_14d:S.sessions.filter(s=>s.kind==="fastfeet"&&s.date>=addDays(t,-13)).length,
+    saved_reviews:S.sessions.filter(s=>s.analysis).slice(0,6).map(s=>({date:s.date,title:s.title,verdict:s.analysis.verdict,headline:s.analysis.headline,whoop:s.whoop})),
+    hard_days_last_14:[...Array(14)].map((_,k)=>addDays(t,k-13)).map(d=>({date:d,hard:!!days[d]?.hard,items:(days[d]?.items||[]).map(i=>i.label)})),
+    run_block:S.runState||DEFAULT_STATE};
+  const prompt=`Write Neil's overall performance summary across running, Tonal strength, padel and footwork.\n\n${COACH}\n\nDATA (JSON):\n${JSON.stringify(data)}\n\nAnswer his four questions: Am I fitter? What should this week look like? Is lean mass holding during the cut (Tonal volume and strength score trend; DEXA is the real check)? Is knee/calf risk rising (impact jumps, consecutive hard days, speed spikes)? Reply with only a JSON object: {"headline": string, "fitness": [2-4 strings], "strength": [2-4 strings], "padel": [1-3 strings], "risk": [strings], "this_week": [3-5 concrete day-by-day strings]}`;
+  try{ const a=await sample.json(prompt,{signal:sumCtl.signal}); card.replaceChildren(el("h3",{},"Where you stand"),el("div",{},a.headline||""),...[["Fitness",a.fitness],["Strength & lean mass",a.strength],["Padel",a.padel],["Risk",a.risk],["This week",a.this_week]].filter(([,l])=>l?.length).map(([h,l])=>el("div",{},el("div",{class:"eyebrow"},h),el("ul",{class:"clean"},l.map(x=>el("li",{},String(x)))))));
+  }catch(e){ card.replaceChildren(el("div",{class:"note crit"},sampleMessage(e))); } });
+
+/* ---------- boot ---------- */
+renderPrograms(); renderRunPicker(); buildFeet(); renderSessionList(); renderTonal(); renderMatches();
+showTab(store.get("tab","run"));
+(async ()=>{ const c=window.claude; if(!c?.use){ setPill("#connStrava","","Strava off"); setPill("#connDb","","Log off"); setPill("#connAi","","Claude off"); return; }
+  const [d,m,s]=await Promise.all([c.use("db"),c.use("mcp"),c.use("sample")]); db=d; mcp=m; sample=s;
+  setPill("#connDb",db?"good":"",db?"Log":"Log off"); setPill("#connAi",sample?"good":"",sample?"Claude":"Claude off"); $("#analyze").disabled=!(sample&&picked);
+  if(db){
+    db.doc("tonal/summary").onSnapshot(sn=>{ S.tonal=sn.exists?sn.data():null; renderTonal(); renderSessionList(); }, ()=>{});
+    db.doc("state/run").onSnapshot(sn=>{ S.runState=sn.exists?sn.data():null; runPick=null; renderRunPicker(); }, ()=>{});
+    db.collection("sessions").orderBy("created","desc").limit(200).onSnapshot(q=>{ S.sessions=q.docs.map(x=>({id:x.id,...x.data()})); renderPastReviews(); }, ()=>{});
+    db.collection("matches").orderBy("date","desc").limit(100).onSnapshot(q=>{ S.matches=q.docs.map(x=>({id:x.id,...x.data()})); renderMatches(); renderAdvice(); }, ()=>{});
+  }
+  if(mcp){ setPill("#connStrava","info","Strava…");
+    mcp.watchTool("Strava","list_activities",{first:60},ev=>{
+      if(ev.type==="data"){ S.strava=ev.result.payload?.activities||[]; S.stravaErr=null; setPill("#connStrava","good","Strava"); }
+      else { const auth=["needs_reauth","server_not_connected","blocked_by_policy","approval_required","not_in_manifest"].includes(ev.error.code); if(auth) S.strava=null; S.stravaErr=mcpMessage(ev.error); setPill("#connStrava","warn","Strava ⚠"); }
+      renderSessionList(); renderAdvice(); if(!$("#tab-summary").hidden) renderSummary(); },{cache:{staleTime:6e4,gcTime:864e5}});
+  } else setPill("#connStrava","","Strava off");
+})();
+</script>
