@@ -26,12 +26,14 @@ Source of truth for the athlete profile, rules, and data caveats. Handed over fr
 - Padel strain > ~15 -> next-day run reads 10+ bpm hot. No quality running the day after padel.
 - Alcohol raises next-day HR ~10 bpm. Travel and heat raise it too. Annotate runs with these confounders.
 - Best data comes from two-day gaps between runs. Tendon/bone adapt slower than the heart: watch step-count jumps (impact volume) separately from HR.
+- Pre-padel meal timing (GLP-1): real meal 3+ h before a match, only light fast carbs inside 1 h. See [PADEL.md](PADEL.md).
 - Cutting phase: don't add cardio to speed up the cut. Protect lean mass with protein and lifting.
 
 ## Data sources and caveats
 - **Strava**: official API (MCP connector works). Runs only from Sep 12 onward. Strava HR zones use age-based max 188, not 201, so zone labels run hot. Barometric elevation is reliable. Gives GAP, splits, best efforts, predicted 5K (~30:40-31:45). Returns metric units.
 - **Whoop**: developer API (OAuth). Strain, recovery, HRV, RHR, sleep, zone time, steps per activity. Elevation is GPS-estimated and inflated (316 ft vs Strava 70 ft, same route). Wrist HR unreliable in padel. Padel calories inflated (~1,000+ kcal/hr).
 - **Tonal**: no official API. Unofficial integration must be optional; app must work without it (manual/CSV fallback). Needed: workout volume, eccentric-mode use, movement-level progress, weekly lower-body load.
+- **Withings**: body composition (weight trend, lean mass estimate). Integration not yet scoped.
 - Display in miles and min/mi.
 
 ## Derived metrics
