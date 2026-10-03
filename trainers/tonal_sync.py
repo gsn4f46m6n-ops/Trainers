@@ -51,11 +51,12 @@ def sync(limit=100):
     _write(OUT / "activities.json", acts)
 
     # Per-workout detail is immutable once done, so only fetch what we don't have.
+    # External activities (e.g. Whoop imports) have no Tonal workout detail and 404.
     new = 0
     for act in acts:
         aid = act.get("activityId")
         path = OUT / "workouts" / f"{aid}.json"
-        if not aid or path.exists():
+        if not aid or path.exists() or act.get("activityType") == "External":
             continue
         _write(path, _check(tt.api_get(f"/v6/users/{uid}/workout-activities/{aid}"), f"workout {aid}"))
         new += 1
