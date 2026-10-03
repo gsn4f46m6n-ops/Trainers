@@ -13,6 +13,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+# Local .env (gitignored) fills in anything not already set in the environment.
+if (ROOT / ".env").exists():
+    for line in (ROOT / ".env").read_text().splitlines():
+        key, sep, val = line.partition("=")
+        if sep and not key.strip().startswith("#") and val.strip():
+            os.environ.setdefault(key.strip(), val.strip())
 os.environ.setdefault("TONAL_TOKEN_DIR", str(Path.home() / ".config" / "trainers" / "tonal"))
 Path(os.environ["TONAL_TOKEN_DIR"]).mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(ROOT / "vendor" / "tonal-api"))
