@@ -2,7 +2,7 @@
 
 Tokens live outside the repo (TONAL_TOKEN_DIR, default ~/.config/trainers/tonal).
 First-time login:
-    python -m trainers.tonal_sync auth <email> <password>
+    python -m trainers.tonal_sync auth      # reads TONAL_EMAIL / TONAL_PASSWORD
     # or passwordless: auth-start <email>, then auth-verify <code>
 Then:
     python -m trainers.tonal_sync            # sync history, details, readiness, strength
@@ -62,6 +62,9 @@ def sync(limit=100):
 if __name__ == "__main__":
     args = sys.argv[1:]
     if args and args[0] in ("auth", "auth-start", "auth-verify", "status", "check-health"):
+        if args == ["auth"]:
+            # Credentials from the environment, so they never appear in a shell command or chat.
+            args = ["auth", os.environ.get("TONAL_EMAIL", ""), os.environ.get("TONAL_PASSWORD", "")]
         handler = {"auth": tt.cmd_auth, "auth-start": tt.cmd_auth_start, "auth-verify": tt.cmd_auth_verify,
                    "status": tt.cmd_status, "check-health": tt.cmd_check_health}[args[0]]
         print(json.dumps(handler(args[1:]), indent=2))

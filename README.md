@@ -9,7 +9,7 @@ git submodule update --init      # pulls vendor/tonal-api (unofficial Tonal tool
 
 ## Tonal
 ```bash
-python -m trainers.tonal_sync auth <email> <password>   # once; stores tokens in ~/.config/trainers/tonal, never the password
+python -m trainers.tonal_sync auth                      # once; reads TONAL_EMAIL / TONAL_PASSWORD env vars, stores tokens in ~/.config/trainers/tonal
 python -m trainers.tonal_sync                           # sync history, per-set details, readiness, strength
 ```
 Needs network access to `api.tonal.com` and `tonal.auth0.com`. Raw pulls land in `data/raw/tonal/` (gitignored).
