@@ -1,0 +1,10 @@
+# Credentials: never commit
+tokens.json
+*.tokens.json
+.env
+
+# Synced personal data (raw API pulls)
+data/raw/
+
+__pycache__/
+*.pyc
